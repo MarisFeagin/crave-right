@@ -4,6 +4,12 @@ html {
   background-color:#3e8e41;
 }
 
+.header {
+  container: initial;
+  background-color: #3e8e41;
+  font-family: Verdana, sans-serif;
+}
+
 body {
   margin: 0;
   padding: 0;
