@@ -1,5 +1,10 @@
-.h1 {
-    color: green;
+html {
+  font-size: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
 }
 
 /* Dropdown Styles*/
