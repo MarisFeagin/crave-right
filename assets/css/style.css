@@ -7,6 +7,10 @@ body {
   padding: 0;
 }
 
+#map {
+  height: 80vh;
+}
+
 /* Dropdown Styles*/
 .dropbtn {
     background-color: #04AA6D;
