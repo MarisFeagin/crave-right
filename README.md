@@ -12,9 +12,8 @@ Crave Right is a Nutrition-based Navigator service that helps you find the best 
 - Users can rate businesses on variety, hospitality, taste, atmosphere, and which diets and allergies are most welcome.
 
 ## Resources
-- Google Cloud Platform: (https://console.cloud.google.com/welcome/new?project=crave-right-map)
-- Maps JavaScript API: (https://console.cloud.google.com/marketplace/product/google/maps-backend.googleapis.com?q=search&referrer=search&project=crave-right-map)
-- Logo Creation: (https://medibangpaint.com/en/)
+- LeafletJS Map API: (https://leafletjs.com)
+- Logo Creation: ()
 
 ## Contributors
 - Maris Feagin (https://github.com/MarisFeagin)
