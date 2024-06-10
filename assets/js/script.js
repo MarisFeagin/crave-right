@@ -7,47 +7,26 @@ var map = L.map('map').setView([39.38064969597025, -97.90948071443827], 5);
     
       osm.addTo(map);
 
-// Drop down JS Diets
+/* Dropdown Filter Menu */
 /* When the user clicks on the button,
 toggle between hiding and showing the dropdown content */
 function myFunction() {
-  document.getElementById("Diets").classList.toggle("show-diets");
+  document.getElementById("myDropdown").classList.toggle("show");
 }
 
 // Close the dropdown menu if the user clicks outside of it
 window.onclick = function(event) {
-  if (!event.target.matches('.dropbtn-diets')) {
-    var dropdowns = document.getElementsByClassName("dropdown-content-diets");
+  if (!event.target.matches('.dropbtn')) {
+    var dropdowns = document.getElementsByClassName("dropdown-content");
     var i;
     for (i = 0; i < dropdowns.length; i++) {
       var openDropdown = dropdowns[i];
-      if (openDropdown.classList.contains('show-diets')) {
-        openDropdown.classList.remove('show-diets');
+      if (openDropdown.classList.contains('show')) {
+        openDropdown.classList.remove('show');
       }
     }
   }
-};
-
-// Drop down JS Allergens
-/* When the user clicks on the button,
-toggle between hiding and showing the dropdown content */
-function myFunction() {
-  document.getElementById("Allergens").classList.toggle("show-allergens");
 }
-
-// Close the dropdown menu if the user clicks outside of it
-window.onclick = function(event) {
-  if (!event.target.matches('.dropbtn-allergens')) {
-    var dropdowns = document.getElementsByClassName("dropdown-content-allergens");
-    var i;
-    for (i = 0; i < dropdowns.length; i++) {
-      var openDropdown = dropdowns[i];
-      if (openDropdown.classList.contains('show-allergens')) {
-        openDropdown.classList.remove('show-allergens');
-      }
-    }
-  }
-};
 
 // Slider JS Calories
 var sliderCal = document.getElementById("calories-per-meal");
