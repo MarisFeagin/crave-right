@@ -19,9 +19,9 @@
                 <input type="search" id="search" name="search" placeholder="Your next meal...">
                 <!--Filters-->
                 <!--Diets-->
-                <div class="dropdown">
-                  <button onclick="myFunction()" class="dropbtn">Diets</button>
-                  <div id="myDropdown" class="dropdown-content">
+                <div class="dropdown-diets">
+                  <button onclick="myFunction()" class="dropbtn-diets">Diets</button>
+                  <div id="Diets" class="dropdown-content-diets">
                     <label class="diets">High-Protein</label><input type="checkbox" name="high-protein" id="diet" value="high-protein" />
                     <label class="diets">High-Fiber</label><input type="checkbox" name="high-fiber" id="diet" value="high-fiber" />
                     <label class="diets">Low-Carb</label><input type="checkbox" name="low-carb" id="diet" value="low-carb" />
@@ -40,9 +40,9 @@
                 </div>
                       
                 <!--Allergies-->
-                <div class="dropdown">
-                  <button onclick="myFunction()" class="dropbtn">Allergens</button>
-                  <div id="myDropdown" class="dropdown-content">
+                <div class="dropdown-allergens">
+                  <button onclick="myFunction()" class="dropbtn-allergens">Allergens</button>
+                  <div id="Allergens" class="dropdown-content-allergens">
                     <label class="allergens">Milk</label><input type="checkbox" name="milk" id="allergy" value="milk" />
                     <label class="allergens">Eggs</label><input type="checkbox" name="eggs" id="allergy" value="eggs" />
                     <label class="allergens">Fish</label><input type="checkbox" name="fish" id="allergy" value="fish" />
@@ -63,6 +63,7 @@
             </form>
           </div>
         </main>
+        <br>
     <!--Map-->
     <div id="map"></div>
 
