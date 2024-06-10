@@ -20,8 +20,9 @@ html {
   padding: 0;
 }
 
-.search-form {
-  align-content: space-evenly;
+form {
+  display: flex;
+  gap: 10px;
 }
 
 /* Dropdown Styling Diets */
@@ -36,7 +37,7 @@ html {
 }
 
 /* Dropdown button on hover & focus */
-.dropbtn-diets:hover, .dropbtn:focus {
+.dropbtn-diets:hover, .dropbtn-diets:focus {
   background-color: #1e7825;
 }
 
@@ -74,7 +75,7 @@ html {
 .dropdown-content-diets label:hover {background-color: #ddd;}
 
 /* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
-.show {display:block;}
+.show-diets {display:block;}
 
 
 
@@ -90,7 +91,7 @@ html {
 }
 
 /* Dropdown button on hover & focus */
-.dropbtn-allergens:hover, .dropbtn:focus {
+.dropbtn-allergens:hover, .dropbtn-allergens:focus {
   background-color: #1e7825;
 }
 
@@ -128,7 +129,9 @@ html {
 .dropdown-content-allergens label:hover {background-color: #ddd;}
 
 /* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
-.show {display:block;}
+.show-allergens {display:block;}
+
+
 
 /* Slider CSS */
 .slidecontainer {
