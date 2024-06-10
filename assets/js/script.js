@@ -28,9 +28,9 @@ window.onclick = function(event) {
   }
 };
 
-// Slider JS
-var slider = document.getElementById("myRange");
-var output = document.getElementById("demo");
+// Slider JS Calories
+var sliderCal = document.getElementById("calories-per-meal");
+var outputCal = document.getElementsById("demo");
 output.innerHTML = slider.value; // Display the default slider value
 
 // Update the current slider value (each time you drag the slider handle)

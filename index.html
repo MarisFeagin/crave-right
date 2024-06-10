@@ -12,9 +12,9 @@
         <h1 class="header">Crave Right</h3>
             <!--About-->
         <!--Map Search-->
-        <main class="search form">
+        <main class="search-form">
           <div class="filters">
-            <form id="nav" class="search cats">
+            <form id="nav" class="search-cats">
                 <!--Search Bar-->
                 <input type="search" id="search" name="search" placeholder="Your next meal...">
                 <!--Filters-->
@@ -57,12 +57,9 @@
                 
                 <!--Calories and Price Ranges-->
                 <div class="slidecontainer">
-                    <label class="slider">Calories Per Meal</label><input type="range" min="100" max="2500" value="500" class="slider" id="calories-per-meal" />
+                    <label class="slider">Calories Per Meal</label><input type="range" min="100" max="2500" value="500" class="slider" id="calories-per-meal" /><p>Calories <span id="demo"></span></p>
                   </div>
-                  <div class="slidecontainer">
-                    <label class="slider">Price Per Meal</label><input type="range" min="1" max="100" value="10" class="slider" id="price-range" />
-                  </div>
-              
+              <button type="submit" class="submit">Search</button>
             </form>
           </div>
         </main>
