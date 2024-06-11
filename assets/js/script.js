@@ -1,3 +1,12 @@
+// Slider Calories JS
+var slider = document.getElementById("myRange");
+var output = document.getElementById("demo");
+output.innerHTML = slider.value;
+
+slider.oninput = function() {
+  output.innerHTML = this.value;
+}
+
 // Map JS
 var map = L.map('map').setView([39.38064969597025, -97.90948071443827], 5);
 
@@ -123,14 +132,5 @@ window.onclick = function(event) {
       }
     }
   }
-}
-
-// Slider Calories JS
-var slider = document.getElementById("myRange");
-var output = document.getElementById("demo");
-output.innerHTML = slider.value;
-
-slider.oninput = function() {
-  output.innerHTML = this.value;
 }
 
