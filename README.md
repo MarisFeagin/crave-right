@@ -13,6 +13,7 @@ Crave Right is a Nutrition-based Navigator service that helps you find the best 
 
 ## Resources
 - LeafletJS Map API: (https://leafletjs.com)
+- Map Tiles From OpenStreetMap: ()
 - Logo Creation: ()
 
 ## Contributors
