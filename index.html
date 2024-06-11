@@ -15,10 +15,11 @@
         <main class="search-form">
             <form id="nav" class="search-cats">
                 <!--Search Bar-->
-                <input type="search" id="search" name="search" placeholder="Your next meal...">
+                <input type="search" class="search-bar" id="search" name="search" placeholder="Your next meal...">
+                <button type="submit" class="submit">Search</button>
                 <!--Filters-->
                 <div class="dropdown">
-                  <button class="dropbtn">Dropdown</button>
+                  <button class="dropbtn">Diets and Allergens</button>
                   <div class="dropdown-content">
                     <h3 class="diets">Diets:</h3>
                      <label class="diets">High-Protein</label><input type="checkbox" name="high-protein" id="diet" value="high-protein" />
@@ -50,9 +51,11 @@
                   
                 <!--Calories and Price Ranges-->
                 <div class="slidecontainer">
-                    <label class="slider-label">Calories Per Meal</label><input type="range" min="100" max="2500" value="500" class="slider" id="calories-per-meal" /><p>Calories:<span id="demo"></span></p>
-                  </div>
-              <button type="submit" class="submit">Search</button>
+                  <p>Calories Per Meal: <span id="demo"></span></p>
+                  <input type="range" min="180" max="3000" value="500" class="slider" id="myRange">
+                  
+                </div>
+              
             </form>
         </main>
         <br>

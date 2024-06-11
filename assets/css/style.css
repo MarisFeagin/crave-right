@@ -22,10 +22,14 @@ html {
 
 form {
   display: flex;
-  gap: 15px;
+  gap: 20px;
 }
 
-/* Dropdown Button */
+.search-bar {
+  width: 30%;
+}
+
+/* Dropdown Button Filter CSS*/
 .dropbtn {
   background-color: #04AA6D;
   color: white;
@@ -45,7 +49,9 @@ form {
   display: none;
   position: absolute;
   background-color: #f1f1f1;
-  min-width: 160px;
+  min-width: 450px;
+  padding-left: 5%;
+  padding-bottom: 5%;
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   z-index: 1000;
 }
@@ -53,9 +59,9 @@ form {
 /* Links inside the dropdown */
 .dropdown-content li {
   color: black;
-  padding: 12px 16px;
+  padding: 30px 24px;
   text-decoration: none;
-  display: block;
+  display: flex;
 }
 
 /* Change color of dropdown links on hover */
@@ -67,20 +73,16 @@ form {
 /* Change the background color of the dropdown button when the dropdown content is shown */
 .dropdown:hover .dropbtn {background-color: #3e8e41;}
 
-/* Slider CSS */
+/* Slider Calorie CSS */
 .slidecontainer {
-  width: 25%; /* Width of the outside container */
+  width: 50%;
 }
 
-.slider-label {
-  text-decoration: none;
-}
-/* The slider itself */
 .slider {
   -webkit-appearance: none;
   width: 100%;
   height: 15px;
-  border-radius: 5px;  
+  border-radius: 5px;
   background: #d3d3d3;
   outline: none;
   opacity: 0.7;
@@ -88,12 +90,16 @@ form {
   transition: opacity .2s;
 }
 
+.slider:hover {
+  opacity: 1;
+}
+
 .slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
   width: 25px;
   height: 25px;
-  border-radius: 50%; 
+  border-radius: 50%;
   background: #04AA6D;
   cursor: pointer;
 }
