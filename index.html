@@ -17,9 +17,10 @@
                 <!--Search Bar-->
                 <input type="search" id="search" name="search" placeholder="Your next meal...">
                 <!--Filters-->
-                  <div class="filters">
-                     <!--Diets-->
-                     <h3 class="diets">Diets:</h3>
+                <div class="dropdown">
+                  <button class="dropbtn">Dropdown</button>
+                  <div class="dropdown-content">
+                    <h3 class="diets">Diets:</h3>
                      <label class="diets">High-Protein</label><input type="checkbox" name="high-protein" id="diet" value="high-protein" />
                      <label class="diets">High-Fiber</label><input type="checkbox" name="high-fiber" id="diet" value="high-fiber" />
                      <label class="diets">Low-Carb</label><input type="checkbox" name="low-carb" id="diet" value="low-carb" />
@@ -45,6 +46,8 @@
                      <label class="allergens">Soy</label><input type="checkbox" name="soy" id="allergy" value="soy" />
                      <label class="allergens">Sesame</label><input type="checkbox" name="sesame" id="allergy" value="sesame" />
                   </div>
+                </div>
+                  
                 <!--Calories and Price Ranges-->
                 <div class="slidecontainer">
                     <label class="slider-label">Calories Per Meal</label><input type="range" min="100" max="2500" value="500" class="slider" id="calories-per-meal" /><p>Calories:<span id="demo"></span></p>
