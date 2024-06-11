@@ -52,22 +52,27 @@ let myJSON=[
      {
        lat:10,
        lon:10,
-       demographic:['youth']
+       demographic:['restuarant']
      },
      {
        lat:6,
        lon:10,
-       demographic:['adults','men']
+       demographic:['cafe']
+     },
+     {
+      lat:6,
+      lon:10,
+      demographic:['bar']
      },
      {
        lat:10,
        lon:12,
-       demographic:['adults']
+       demographic:['grocery-store']
      },
      {
        lat:7,
        lon:8,
-       demographic:['adults','seniors','women']
+       demographic:['gas-station']
      }
    ]
 
@@ -84,20 +89,20 @@ function filter() {
 
 	let categories=[];
   
-	if (cbAdults.checked) {
-  	categories.push('adults');
+	if (cbRestuarant.checked) {
+  	categories.push('restuarant');
   }
-  if (cbYouth.checked) {
-  	categories.push('youth');
+  if (cbCafe.checked) {
+  	categories.push('cafe');
   }
-  if (cbSeniors.checked) {
+  if (cbBar.checked) {
   	categories.push('seniors')
   }
-  if (cbMen.checked) {
-  	categories.push('men');
+  if (cbGroceryStore.checked) {
+  	categories.push('grocery-store');
   }
-  if (cbWomen.checked) {
-  	categories.push('women');
+  if (cbGasStation.checked) {
+  	categories.push('gas-station');
   }
   
   
