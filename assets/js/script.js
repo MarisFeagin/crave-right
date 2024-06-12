@@ -52,7 +52,7 @@ let myJSON=[
      {
        lat:10,
        lon:10,
-       demographic:['restuarant']
+       demographic:['restaurant']
      },
      {
        lat:6,
@@ -90,13 +90,13 @@ function filter() {
 	let categories=[];
   
 	if (cbRestuarant.checked) {
-  	categories.push('restuarant');
+  	categories.push('restaurant');
   }
   if (cbCafe.checked) {
   	categories.push('cafe');
   }
   if (cbBar.checked) {
-  	categories.push('seniors')
+  	categories.push('bar')
   }
   if (cbGroceryStore.checked) {
   	categories.push('grocery-store');
