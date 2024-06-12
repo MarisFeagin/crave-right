@@ -13,6 +13,7 @@ html {
   container: initial;
   background-color: #3e8e41;
   font-family: Verdana, sans-serif;
+  display: flex;
 }
 
 .body {
