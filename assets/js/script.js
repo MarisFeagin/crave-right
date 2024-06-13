@@ -48,7 +48,37 @@ var map = L.map('map').setView([39.38064969597025, -97.90948071443827], 5);
   }
 
 // Map Markers JS
+// Get user's location
+navigator.geolocation.getCurrentPosition(function(position) {
+  var userLat = position.coords.latitude;
+  var userLng = position.coords.longitude;
 
+  // Query Overpass API for restaurant nodes in the user's area
+  var overpassUrl = 'https://lz4.overpass-api.de/api/interpreter';
+  var overpassQuery = `
+      [out:json];
+      node["amenity"="restaurant"](around:${userLat},${userLng},1000); // 1000 meters radius
+      out;
+  `;
+
+  fetch(overpassUrl, {
+      method: 'POST',
+      body: overpassQuery
+  })
+  .then(response => response.json())
+  .then(data => {
+      // Parse Overpass API response and extract restaurant coordinates
+      var restaurantCoordinates = data.elements.map(function(element) {
+          return { lat: element.lat, lon: element.lon };
+      });
+
+      // Add markers for restaurant coordinates in the user's area
+      restaurantCoordinates.forEach(function(coord) {
+          L.marker([coord.lat, coord.lon]).addTo(map);
+      });
+  })
+  .catch(error => console.error('Error fetching restaurant data:', error));
+});
 
 /* Dropdown Filter Menu */
 /* When the user clicks on the button,
