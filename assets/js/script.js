@@ -47,76 +47,8 @@ var map = L.map('map').setView([39.38064969597025, -97.90948071443827], 5);
     }
   }
 
-// Filter Markers
-let myJSON=[
-     {
-       lat:10,
-       lon:10,
-       demographic:['restaurant']
-     },
-     {
-       lat:6,
-       lon:10,
-       demographic:['cafe']
-     },
-     {
-      lat:6,
-      lon:10,
-      demographic:['bar']
-     },
-     {
-       lat:10,
-       lon:12,
-       demographic:['grocery-store']
-     },
-     {
-       lat:7,
-       lon:8,
-       demographic:['gas-station']
-     }
-   ]
+// Map Markers JS
 
-let myMarkers = L.featureGroup().addTo(map);
-
-filter();
-btnForm.onclick=()=>filter();
-
-function filter() {
-
-	myMarkers.clearLayers();
-
-	let myJSONcopy = JSON.parse(JSON.stringify(myJSON));
-
-	let categories=[];
-  
-	if (cbRestuarant.checked) {
-  	categories.push('restaurant');
-  }
-  if (cbCafe.checked) {
-  	categories.push('cafe');
-  }
-  if (cbBar.checked) {
-  	categories.push('bar')
-  }
-  if (cbGroceryStore.checked) {
-  	categories.push('grocery-store');
-  }
-  if (cbGasStation.checked) {
-  	categories.push('gas-station');
-  }
-  
-  
-  for (let i=0;i<myJSONcopy.length;i++){
-   for (let j=0;j<categories.length;j++){
-   	for (let k=0;k<myJSONcopy[i].demographic.length;k++)
-    	if (categories[j]==myJSONcopy[i].demographic[k] && !myJSONcopy[i].added){
-      	L.circleMarker([myJSONcopy[i].lat,myJSONcopy[i].lon]).addTo(myMarkers);
-        myJSONcopy[i].added=true;
-        break;
-      }
-   }
-  }
-}
 
 /* Dropdown Filter Menu */
 /* When the user clicks on the button,
