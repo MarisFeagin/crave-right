@@ -53,25 +53,26 @@ navigator.geolocation.getCurrentPosition(function(position) {
   var userLat = position.coords.latitude;
   var userLng = position.coords.longitude;
 
+  // Validate latitude and longitude
+  if (isNaN(userLat) || isNaN(userLng)) {
+    console.error("Invalid latitude or longitude.");
+    return;
+  }
+
   // Query Overpass API for restaurant nodes in the user's area
   var overpassUrl = 'https://lz4.overpass-api.de/api/interpreter';
-  var overpassQuery = `
-      [out:json];
-      node["amenity"="restaurant"](around:${userLat},${userLng},1000); // 1000 meters radius
-      out;
-  `;
+  var overpassQuery = '[out:json];node["amenity"="restaurant"](around:' + userLat + "," + userLng + ',1000);out;';
 
-  fetch(overpassUrl, {
-      method: 'POST',
-      body: overpassQuery
-  })
+  fetch(overpassUrl + '?data=' + encodeURIComponent(overpassQuery))
   .then(response => response.json())
   .then(data => {
-      // Parse Overpass API response and extract restaurant coordinates
+      // Extract restaurant coordinates from Overpass API response
       var restaurantCoordinates = data.elements.map(function(element) {
-          return { lat: element.lat, lon: element.lon };
-      });
-
+        return {
+          lat: element.lat,
+          lon: element.lon,
+        }
+      })
       // Add markers for restaurant coordinates in the user's area
       restaurantCoordinates.forEach(function(coord) {
           L.marker([coord.lat, coord.lon]).addTo(map);
