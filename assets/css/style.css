@@ -16,6 +16,18 @@ html {
   display: flex;
 }
 
+p {
+  font-family: Verdana, sans-serif;
+}
+
+.nav {
+  text-align: center;
+}
+
+ul {
+  visibility: hidden;
+}
+
 .body {
   margin: 0;
   padding: 0;
@@ -37,6 +49,7 @@ form {
   padding: 16px;
   font-size: 16px;
   border: none;
+  font-family: Verdana, sans-serif;
 }
 
 /* The container <div> - needed to position the dropdown content */
@@ -55,6 +68,7 @@ form {
   padding-bottom: 5%;
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   z-index: 1000;
+  font-family: Verdana, sans-serif;
 }
 
 /* Links inside the dropdown */
@@ -63,6 +77,7 @@ form {
   padding: 30px 24px;
   text-decoration: none;
   display: flex;
+  font-family: Verdana, sans-serif;
 }
 
 /* Change color of dropdown links on hover */
@@ -118,6 +133,7 @@ form {
   background-color: #3e7545;
   padding: 16px;
   font-size: 16px;
+  font-family: Verdana, sans-serif;
   cursor: pointer;
 }
 
