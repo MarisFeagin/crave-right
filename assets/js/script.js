@@ -81,6 +81,29 @@ navigator.geolocation.getCurrentPosition(function(position) {
   .catch(error => console.error('Error fetching restaurant data:', error));
 });
 
+// Marker
+L.marker([33.7018381,-78.8711748], {
+  title: "River City Cafe"
+})
+.bindPopup(`
+  <span class="popup">
+    <h2> River City Cafe </h2>
+    <p>Classification</p><p>Notable Diets/Allergies</p>
+    <svg>
+    <button type="button" target="_blank">Order Online</button>
+    <h3>Menu</h3>
+    <p>Address</p>  
+    <p>Phone Number: <a href="tel:(843)-420-4202">(843)-420-4202</a></p>
+    <a href=" " target="_blank">Website</a>
+    <p>Op Hours</p>
+    <ul>
+     <li>Mon-Fri: 6:00 AM - 9:00 PM</li>
+     <li>Sat-Sun: 8:00 AM - 10:00 PM</li>
+    </ul>
+  </span>
+  `)
+.addTo(map)
+
 /* Dropdown Filter Menu */
 /* When the user clicks on the button,
 toggle between hiding and showing the dropdown content */
