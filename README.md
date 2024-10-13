@@ -4,7 +4,7 @@ Crave Right is a Nutrition-based Navigator service that helps you find the best 
 
 ## Features
 - Crave Right features a custom filter system with the help of Open Street Map's API to locate businesses that best match user preferences in their local area.
-- Filter inculdes a range of diets, allergens, cultural cuisine, price range, calorie range, and more!
+- The filter inculdes a range of diets, allergens, cultural cuisine, price range, calorie range, and more!
 - Location Markers contain pages on individual businesses with list of dietary and allergen options, price range, other users reviews, and distance mileage.
 
 ## Stretch Goals
