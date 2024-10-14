@@ -7,81 +7,79 @@ slider.oninput = function() {
   output.innerHTML = this.value;
 }
 
-// Map JS
+// script.js
+
+// Initialize the map
 var map = L.map('map').setView([39.38064969597025, -97.90948071443827], 5);
 
-      var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      })
-    
-      osm.addTo(map);
-  navigator.geolocation.watchPosition(success, error);
+var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+});
 
-  let marker, circle, zoomed;
+osm.addTo(map);
 
-  function success(pos) {
+// Geolocation
+navigator.geolocation.watchPosition(success, error);
+
+let marker, circle, zoomed;
+
+function success(pos) {
     const lat = pos.coords.latitude;
     const lng = pos.coords.longitude;
     const accuracy = pos.coords.accuracy;
 
     if (marker) {
-      map.removeLayer(marker);
-      map.removeLayer(circle);
+        map.removeLayer(marker);
+        map.removeLayer(circle);
     }
 
-    marker = L.marker([lat, lng,]).addTo(map);
-    circle = L.circle([lat, lng,], { radius: accuracy }).addTo(map);
+    marker = L.marker([lat, lng]).addTo(map);
+    circle = L.circle([lat, lng], { radius: accuracy }).addTo(map);
 
     if (!zoomed) {
-      zoomed = map.fitBounds(circle.getBounds());
+        zoomed = map.fitBounds(circle.getBounds());
     }
 
     map.setView([lat, lng]);
-  }
 
-  function error(err) {
+    // Fetch and display restaurants after user location is obtained
+    fetchRestaurants(lat, lng);
+}
+
+function error(err) {
     if (err.code === 1) {
-      alert("Please allow Crave Right to see your geolocation so we can match you with the best local food!");
+        alert("Please allow Crave Right to see your geolocation so we can match you with the best local food!");
     } else {
-      alert("Crave Right can't find your location");
+        alert("Crave Right can't find your location");
     }
-  }
+}
 
-// Map Markers JS
-// Get user's location
-navigator.geolocation.getCurrentPosition(function(position) {
-  var userLat = position.coords.latitude;
-  var userLng = position.coords.longitude;
+// Function to fetch restaurants using Overpass API
+function fetchRestaurants(lat, lng) {
+    const radius = 1000; // Search radius in meters
+    const overpassUrl = 'https://lz4.overpass-api.de/api/interpreter';
+    const overpassQuery = `
+        [out:json];
+        node["amenity"="restaurant"](around:${radius}, ${lat}, ${lng});
+        out;
+    `;
 
-  // Validate latitude and longitude
-  if (isNaN(userLat) || isNaN(userLng)) {
-    console.error("Invalid latitude or longitude.");
-    return;
-  }
+    fetch(overpassUrl + '?data=' + encodeURIComponent(overpassQuery))
+        .then(response => response.json())
+        .then(data => {
+            // Extract restaurant coordinates from Overpass API response
+            data.elements.forEach(element => {
+                if (element.lat && element.lon) {
+                    L.marker([element.lat, element.lon]).addTo(map)
+                        .bindPopup(element.tags?.name || 'Unnamed Restaurant');
+                }
+            });
+        })
+        .catch(error => console.error('Error fetching restaurant data:', error));
+}
 
-  // Query Overpass API for restaurant nodes in the user's area
-  var overpassUrl = 'https://lz4.overpass-api.de/api/interpreter';
-  var overpassQuery = '[out:json];node["amenity"="restaurant"](around:' + userLat + "," + userLng + ',1000);out;';
 
-  fetch(overpassUrl + '?data=' + encodeURIComponent(overpassQuery))
-  .then(response => response.json())
-  .then(data => {
-      // Extract restaurant coordinates from Overpass API response
-      var restaurantCoordinates = data.elements.map(function(element) {
-        return {
-          lat: element.lat,
-          lon: element.lon,
-        }
-      })
-      // Add markers for restaurant coordinates in the user's area
-      restaurantCoordinates.forEach(function(coord) {
-          L.marker([coord.lat, coord.lon]).addTo(map);
-      });
-  })
-  .catch(error => console.error('Error fetching restaurant data:', error));
-});
-
-// Marker
+// Test Marker
 L.marker([33.7018381,-78.8711748], {
   title: "River City Cafe"
 })

@@ -6,7 +6,7 @@
     <title>Crave Right</title>
     <link rel="icon" href="./assets/images/Crave Right logo.svg" type="image/icon svg">
     <link rel="stylesheet" href="./assets/css/style.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 </head>
 <body>
         <!--Header-->
@@ -25,30 +25,32 @@
                   <button class="dropbtn">Diets and Allergens</button>
                   <div class="dropdown-content">
                     <h3 class="diets">Diets:</h3>
-                     <label class="diets">High-Protein</label><input type="checkbox" name="high-protein" id="diet" value="high-protein" />
-                     <label class="diets">High-Fiber</label><input type="checkbox" name="high-fiber" id="diet" value="high-fiber" />
-                     <label class="diets">Low-Carb</label><input type="checkbox" name="low-carb" id="diet" value="low-carb" /><br>
-                     <label class="diets">Vegan</label><input type="checkbox" name="vegan" id="diet" value="vegan" />
-                     <label class="diets">Vegetarian</label><input type="checkbox" name="vegetarian" id="diet" value="vegetarian" />
-                     <label class="diets">Pescatarian</label><input type="checkbox" name="pescatarian" id="diet" value="pescatarian" /><br>
-                     <label class="diets">Keto</label><input type="checkbox" name="keto" id="diet" value="keto" />
-                     <label class="diets">Paleo</label><input type="checkbox" name="paleo" id="diet" value="paleo" />
-                     <label class="diets">Kosher</label><input type="checkbox" name="kosher" id="diet" value="kosher" /><br>
-                     <label class="diets">Organic</label><input type="checkbox" name="organic" id="diet" value="organic" />
-                     <label class="diets">Carnivore</label><input type="checkbox" name="carnivore" id="diet" value="carnivore" />
-                     <label class="diets">Raw</label><input type="checkbox" name="raw" id="diet" value="raw" /><br>
-                     <label class="diets">Non-Dairy</label><input type="checkbox" name="non-dairy" id="diet" value="non-dairy" />
-                     <label class="diets">Anti-Inflammatory</label><input type="checkbox" name="anti-inflammatory" id="diet" value="anti-inflam" />
+                     <label class="diets">High-Protein</label><input type="checkbox" name="high-protein" id="high-protein" value="high-protein" />
+                     <label class="diets">High-Fiber</label><input type="checkbox" name="high-fiber" id="high-fiber" value="high-fiber" />
+                     <label class="diets">Low-Carb</label><input type="checkbox" name="low-carb" id="low-carb" value="low-carb" /><br>
+                     <label class="diets">Vegan</label><input type="checkbox" name="vegan" id="vegan" value="vegan" />
+                     <label class="diets">Vegetarian</label><input type="checkbox" name="vegetarian" id="vegetarian" value="vegetarian" />
+                     <label class="diets">Pescatarian</label><input type="checkbox" name="pescatarian" id="pescatarian" value="pescatarian" /><br>
+                     <label class="diets">Keto</label><input type="checkbox" name="keto" id="keto" value="keto" />
+                     <label class="diets">Paleo</label><input type="checkbox" name="paleo" id="paleo" value="paleo" />
+                     <label class="diets">Kosher</label><input type="checkbox" name="kosher" id="kosher" value="kosher" /><br>
+                     <label class="diets">Organic</label><input type="checkbox" name="organic" id="organic" value="organic" />
+                     <label class="diets">Carnivore</label><input type="checkbox" name="carnivore" id="carnivore" value="carnivore" />
+                     <label class="diets">Raw</label><input type="checkbox" name="raw" id="raw" value="raw" /><br>
+                     <label class="diets">Non-Dairy</label><input type="checkbox" name="non-dairy" id="non-dairy" value="non-dairy" />
+                     <label class="diets">Anti-Inflammatory</label><input type="checkbox" name="anti-inflammatory" id="anti-inflam" value="anti-inflam" />
                      <h3 class="allergens">Allergens:</h3>
-                     <label class="allergens">Milk</label><input type="checkbox" name="milk" id="allergy" value="milk" />
-                     <label class="allergens">Eggs</label><input type="checkbox" name="eggs" id="allergy" value="eggs" />
-                     <label class="allergens">Fish</label><input type="checkbox" name="fish" id="allergy" value="fish" />
-                     <label class="allergens">Crustacean/Shellfish</label><input type="checkbox" name="crustaceanShellfish" id="allergy" value="crustaceanShellfish" /><br>
-                     <label class="allergens">Tree Nuts</label><input type="checkbox" name="tree-nuts" id="allergy" value="tree-nuts" />
-                     <label class="allergens">Peanuts</label><input type="checkbox" name="peanuts" id="allergy" value="peanuts" />
-                     <label class="allergens">Wheat</label><input type="checkbox" name="wheat" id="allergy" value="wheat" />
-                     <label class="allergens">Soy</label><input type="checkbox" name="soy" id="allergy" value="soy" />
-                     <label class="allergens">Sesame</label><input type="checkbox" name="sesame" id="allergy" value="sesame" />
+                     <label class="allergens">Milk</label><input type="checkbox" name="milk" id="milk" value="milk" />
+                     <label class="allergens">Eggs</label><input type="checkbox" name="eggs" id="eggs" value="eggs" />
+                     <label class="allergens">Wheat</label><input type="checkbox" name="wheat" id="wheat" value="wheat" />
+                     <label class="allergens">Soy</label><input type="checkbox" name="soy" id="soy" value="soy" /><br>
+                     <label class="allergens">Fish</label><input type="checkbox" name="fish" id="fish" value="fish" />
+                     <label class="allergens">Crustacean</label><input type="checkbox" name="crustacean" id="crustacean" value="crustacean" />
+                     <label class="allergens">Shellfish</label><input type="checkbox" name="shellfish" id="shellface" value="shellface" /><br>
+                     <label class="allergens">Tree Nuts</label><input type="checkbox" name="tree-nuts" id="tree-nuts" value="tree-nuts" />
+                     <label class="allergens">Peanuts</label><input type="checkbox" name="peanuts" id="peanuts" value="peanuts" />
+                     <label class="allergens">Legumes</label><input type="checkbox" name="Legumes" id="Legumes" value="Legumes" />
+                     <label class="allergens">Sesame</label><input type="checkbox" name="sesame" id="sesame" value="sesame" />
                   </div>
                 </div>
 
@@ -56,12 +58,12 @@
                   <button class="dropbtn">Type of Business</button>
                   <div class="dropdown-content">
                     <h3 class="business">Eatries:</h3>
-                     <label class="restuarant">Restaurant</label><input type="checkbox" name="restuarant" id="filters" value="restuarant" />
-                     <label class="restuarant">Cafe</label><input type="checkbox" name="cafe" id="filters" value="cafe" />
-                     <label class="restuarant">Bar</label><input type="checkbox" name="bar" id="filters" value="bar" />
-                     <label class="restuarant">Grocery Store</label><input type="checkbox" name="grocery-store" id="filters" value="grocery-store" />
-                     <label class="restuarant">Gas Station</label><input type="checkbox" name="gas-station" id="filters" value="gas-station" />
-                     <label class="restuarant">Chain</label><input type="checkbox" name="chain" id="filters" value="chain" />
+                     <label class="restuarant">Restaurant</label><input type="checkbox" name="restuarant" id="restuarant" value="restuarant" />
+                     <label class="restuarant">Cafe</label><input type="checkbox" name="cafe" id="cafe" value="cafe" />
+                     <label class="restuarant">Bar</label><input type="checkbox" name="bar" id="bar" value="bar" />
+                     <label class="restuarant">Grocery Store</label><input type="checkbox" name="grocery-store" id="grocery" value="grocery-store" />
+                     <label class="restuarant">Gas Station</label><input type="checkbox" name="gas-station" id="gas" value="gas-station" />
+                     <label class="restuarant">Chain</label><input type="checkbox" name="chain" id="chain" value="chain" />
                      
                   </div>
                 </div>
@@ -94,7 +96,9 @@
      </footer>
 
     <!--leaflet js-->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="./assets/js/script.js"></script>
+
+    <!--Marker Generator-->
 </body>
 </html>
