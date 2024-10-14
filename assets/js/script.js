@@ -103,7 +103,6 @@ L.marker([33.7018381,-78.8711748], {
 })
 .bindPopup(`
   <span class="popup">
-    <h2> River City Cafe </h2>
     <p>Classification</p><p>Notable Diets/Allergies</p>
     <svg>
     <button type="button" target="_blank">Order Online</button>
