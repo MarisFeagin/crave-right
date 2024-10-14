@@ -18,21 +18,25 @@ var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 osm.addTo(map);
 
-// Geolocation
+// Geolocation variables
+let marker, circle, zoomed;
+let markers = []; // Array to store restaurant markers
+
+// Start geolocation
 navigator.geolocation.watchPosition(success, error);
 
-let marker, circle, zoomed;
-
 function success(pos) {
-    const lat = pos.coords.latitude;
-    const lng = pos.coords.longitude;
+    const lat = pos.coords.latitude; // Define lat here
+    const lng = pos.coords.longitude; // Define lng here
     const accuracy = pos.coords.accuracy;
 
+    // Remove old marker and circle
     if (marker) {
         map.removeLayer(marker);
         map.removeLayer(circle);
     }
 
+    // Add new marker and circle
     marker = L.marker([lat, lng]).addTo(map);
     circle = L.circle([lat, lng], { radius: accuracy }).addTo(map);
 
@@ -56,7 +60,7 @@ function error(err) {
 
 // Function to fetch restaurants using Overpass API
 function fetchRestaurants(lat, lng) {
-    const radius = 1000; // Search radius in meters
+    const radius = 6500; // Search radius in meters
     const overpassUrl = 'https://lz4.overpass-api.de/api/interpreter';
     const overpassQuery = `
         [out:json];
@@ -67,16 +71,30 @@ function fetchRestaurants(lat, lng) {
     fetch(overpassUrl + '?data=' + encodeURIComponent(overpassQuery))
         .then(response => response.json())
         .then(data => {
+            console.log(data); // Log the API response
+
+            // Clear previous markers
+            markers.forEach(marker => map.removeLayer(marker));
+            markers = []; // Reset the markers array
+
             // Extract restaurant coordinates from Overpass API response
-            data.elements.forEach(element => {
-                if (element.lat && element.lon) {
-                    L.marker([element.lat, element.lon]).addTo(map)
-                        .bindPopup(element.tags?.name || 'Unnamed Restaurant');
-                }
-            });
+            if (data.elements && data.elements.length > 0) {
+                data.elements.forEach(element => {
+                    if (element.lat && element.lon) {
+                        console.log(`Adding Marker: ${element.lat}, ${element.lon}`); // Log marker coordinates
+                        const newMarker = L.marker([element.lat, element.lon]).addTo(map)
+                            .bindPopup(element.tags?.name || 'Unnamed Restaurant');
+                        markers.push(newMarker); // Store the marker
+                    }
+                });
+            } else {
+                console.warn('No restaurants found in the area.');
+            }
         })
         .catch(error => console.error('Error fetching restaurant data:', error));
 }
+
+
 
 
 // Test Marker
