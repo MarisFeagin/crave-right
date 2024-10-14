@@ -60,7 +60,7 @@ function error(err) {
 
 // Function to fetch restaurants using Overpass API
 function fetchRestaurants(lat, lng) {
-    const radius = 6500; // Search radius in meters
+    const radius = 5000; // Search radius in meters
     const overpassUrl = 'https://lz4.overpass-api.de/api/interpreter';
     const overpassQuery = `
         [out:json];
@@ -77,14 +77,52 @@ function fetchRestaurants(lat, lng) {
             markers.forEach(marker => map.removeLayer(marker));
             markers = []; // Reset the markers array
 
+            // Create a LatLng object for the user's location
+            const userLocation = L.latLng(lat, lng);
+
             // Extract restaurant coordinates from Overpass API response
             if (data.elements && data.elements.length > 0) {
                 data.elements.forEach(element => {
                     if (element.lat && element.lon) {
-                        console.log(`Adding Marker: ${element.lat}, ${element.lon}`); // Log marker coordinates
-                        const newMarker = L.marker([element.lat, element.lon]).addTo(map)
-                            .bindPopup(element.tags?.name || 'Unnamed Restaurant');
-                        markers.push(newMarker); // Store the marker
+                        const restaurantLocation = L.latLng(element.lat, element.lon);
+                        
+                        // Calculate the distance from the user's location to the restaurant
+                        const distance = userLocation.distanceTo(restaurantLocation);
+                        console.log(`Distance to restaurant (${element.lat}, ${element.lon}): ${distance} meters`);
+
+                        // Only add marker if within the specified radius
+                        if (distance <= radius) {
+                            console.log(`Adding Marker: ${element.lat}, ${element.lon}`); // Log marker coordinates
+
+                            // Construct the popup content
+                            const name = element.tags?.name || 'Unnamed Restaurant';
+                            const classification = element.tags?.amenity || 'Unknown Classification';
+                            const dietInfo = element.tags?.diet || 'No diets';
+                            const address = element.tags?.address?.full || 'No address provided';
+                            const phone = element.tags?.phone || 'No phone number';
+                            const website = element.tags?.website || '#';
+                            const openingHours = element.tags?.opening_hours || 'No hours provided';
+
+                            const popupContent = `
+                                <span class="popup">
+                                    <h3>${name}</h3>
+                                    <p><strong>${classification}</strong></p>
+                                    <p><strong>${dietInfo} are currently welcome!</strong></p>
+                                    <p><strong>Address:</strong> ${address}</p>
+                                    <p><strong>Phone Number:</strong> <a href="tel:${phone}">${phone}</a></p>
+                                    ${website !== '#' ? `<p><strong>Website:</strong> <a href="${website}" target="_blank" rel="noopener noreferrer">${website}</a></p>` : '<p>No website available</p>'}
+                                    <p><strong>Open Hours:</strong> ${openingHours}</p>
+                                    <button type="button" target="_blank">Order Online</button>
+                                </span>
+                            `;
+
+                            const newMarker = L.marker([element.lat, element.lon])
+                                .addTo(map)
+                                .bindPopup(popupContent);
+                            markers.push(newMarker); // Store the marker
+                        } else {
+                            console.log(`Skipping restaurant (${element.lat}, ${element.lon}), distance: ${distance} meters`);
+                        }
                     }
                 });
             } else {
@@ -93,31 +131,6 @@ function fetchRestaurants(lat, lng) {
         })
         .catch(error => console.error('Error fetching restaurant data:', error));
 }
-
-
-
-
-// Test Marker
-L.marker([33.7018381,-78.8711748], {
-  title: "River City Cafe"
-})
-.bindPopup(`
-  <span class="popup">
-    <p>Classification</p><p>Notable Diets/Allergies</p>
-    <svg>
-    <button type="button" target="_blank">Order Online</button>
-    <h3>Menu</h3>
-    <p>Address</p>  
-    <p>Phone Number: <a href="tel:(843)-420-4202">(843)-420-4202</a></p>
-    <a href=" " target="_blank">Website</a>
-    <p>Op Hours</p>
-    <ul>
-     <li>Mon-Fri: 6:00 AM - 9:00 PM</li>
-     <li>Sat-Sun: 8:00 AM - 10:00 PM</li>
-    </ul>
-  </span>
-  `)
-.addTo(map)
 
 /* Dropdown Filter Menu */
 /* When the user clicks on the button,
