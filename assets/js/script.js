@@ -58,13 +58,67 @@ function error(err) {
     }
 }
 
+function capitalizeWords(str) {
+    return str.split(' ').map(word => 
+        word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+    ).join(' ');
+}
+
+function formatOpeningHours(openingHours, lat, lng) {
+    const { DateTime } = luxon;
+
+    // Check if openingHours is valid
+    if (!openingHours || openingHours === 'No hours provided') {
+        return 'No hours available';
+    }
+
+    const hoursArray = openingHours.split(',');
+    const formattedHours = hoursArray.map(hours => {
+        const parts = hours.trim().split(': '); // Split by ': ' to separate day and time
+
+        // Ensure we have at least two parts (day and time)
+        if (parts.length < 2) {
+            return hours; // Return the original string if format is unexpected
+        }
+
+        const day = parts[0];
+        const timeRange = parts[1].trim(); // Time range after day
+
+        // Split the time range into start and end times
+        const [start, end] = timeRange.split(' - ');
+
+        // Ensure both start and end times are provided
+        if (!start || !end) {
+            return hours; // Return the original string if times are missing
+        }
+
+        // Get the local timezone from coordinates
+        const timeZone = DateTime.local().setZone(DateTime.fromObject({ lat, lng }).zoneName).zoneName;
+
+        // Attempt to parse the start and end times
+        const startTime = DateTime.fromFormat(start.trim(), 'hh:mm a', { zone: timeZone });
+        const endTime = DateTime.fromFormat(end.trim(), 'hh:mm a', { zone: timeZone });
+
+        // Check for invalid times
+        if (startTime.invalid || endTime.invalid) {
+            return hours; // Return the original string if times are invalid
+        }
+
+        // Format the times in the local timezone
+        return `${day}: ${startTime.setZone(timeZone).toFormat('hh:mm a')} - ${endTime.setZone(timeZone).toFormat('hh:mm a')}`;
+    });
+
+    return formattedHours.join(', ');
+}
+
+
 // Function to fetch restaurants using Overpass API
 function fetchRestaurants(lat, lng) {
     const radius = 5000; // Search radius in meters
     const overpassUrl = 'https://lz4.overpass-api.de/api/interpreter';
     const overpassQuery = `
         [out:json];
-        node["amenity"="restaurant"](around:${radius}, ${lat}, ${lng});
+        node["amenity"~"restaurant|cafe|bar|grocery|fuel|fast_food"](around:${radius}, ${lat}, ${lng});
         out;
     `;
 
@@ -96,23 +150,33 @@ function fetchRestaurants(lat, lng) {
 
                             // Construct the popup content
                             const name = element.tags?.name || 'Unnamed Restaurant';
-                            const classification = element.tags?.amenity || 'Unknown Classification';
+                            
+                            // Custom classification for fast food
+                            let classification = element.tags?.amenity || 'Unknown Classification';
+                            if (classification === 'fast_food') {
+                                classification = 'Quick Service';
+                            }
+                            classification = capitalizeWords(classification);
+
                             const dietInfo = element.tags?.diet || 'No diets';
                             const address = element.tags?.address?.full || 'No address provided';
                             const phone = element.tags?.phone || 'No phone number';
                             const website = element.tags?.website || '#';
                             const openingHours = element.tags?.opening_hours || 'No hours provided';
 
+                            // Format the opening hours based on local time zone
+                            const formattedOpeningHours = formatOpeningHours(openingHours, lat, lng);
+
                             const popupContent = `
                                 <span class="popup">
                                     <h3>${name}</h3>
                                     <p><strong>${classification}</strong></p>
                                     <p><strong>${dietInfo} are currently welcome!</strong></p>
+                                    <button type="button" target="_blank">Order Online</button>
                                     <p><strong>Address:</strong> ${address}</p>
                                     <p><strong>Phone Number:</strong> <a href="tel:${phone}">${phone}</a></p>
                                     ${website !== '#' ? `<p><strong>Website:</strong> <a href="${website}" target="_blank" rel="noopener noreferrer">${website}</a></p>` : '<p>No website available</p>'}
-                                    <p><strong>Open Hours:</strong> ${openingHours}</p>
-                                    <button type="button" target="_blank">Order Online</button>
+                                    <p><strong>Open Hours:</strong> ${formattedOpeningHours}</p>
                                 </span>
                             `;
 
