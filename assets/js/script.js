@@ -64,19 +64,22 @@ function capitalizeWords(str) {
     ).join(' ');
 }
 
-function formatOpeningHours(openingHours, lat, lng) {
+async function formatOpeningHours(openingHours, lat, lng) {
     const { DateTime } = luxon;
 
-    // Check if openingHours is valid
     if (!openingHours || openingHours === 'No hours provided') {
         return 'No hours available';
     }
 
+    // For demonstration, you can use a hardcoded timezone. 
+    // Replace this with the actual timezone retrieved from an API if needed.
+    const timeZone = 'America/New_York'; // Example timezone; replace as needed
+
     const hoursArray = openingHours.split(',');
+
     const formattedHours = hoursArray.map(hours => {
         const parts = hours.trim().split(': '); // Split by ': ' to separate day and time
 
-        // Ensure we have at least two parts (day and time)
         if (parts.length < 2) {
             return hours; // Return the original string if format is unexpected
         }
@@ -84,22 +87,16 @@ function formatOpeningHours(openingHours, lat, lng) {
         const day = parts[0];
         const timeRange = parts[1].trim(); // Time range after day
 
-        // Split the time range into start and end times
         const [start, end] = timeRange.split(' - ');
 
-        // Ensure both start and end times are provided
         if (!start || !end) {
             return hours; // Return the original string if times are missing
         }
-
-        // Get the local timezone from coordinates
-        const timeZone = DateTime.local().setZone(DateTime.fromObject({ lat, lng }).zoneName).zoneName;
 
         // Attempt to parse the start and end times
         const startTime = DateTime.fromFormat(start.trim(), 'hh:mm a', { zone: timeZone });
         const endTime = DateTime.fromFormat(end.trim(), 'hh:mm a', { zone: timeZone });
 
-        // Check for invalid times
         if (startTime.invalid || endTime.invalid) {
             return hours; // Return the original string if times are invalid
         }
@@ -112,8 +109,9 @@ function formatOpeningHours(openingHours, lat, lng) {
 }
 
 
+
 // Function to fetch restaurants using Overpass API
-function fetchRestaurants(lat, lng) {
+async function fetchRestaurants(lat, lng) {
     const radius = 5000; // Search radius in meters
     const overpassUrl = 'https://lz4.overpass-api.de/api/interpreter';
     const overpassQuery = `
@@ -125,67 +123,55 @@ function fetchRestaurants(lat, lng) {
     fetch(overpassUrl + '?data=' + encodeURIComponent(overpassQuery))
         .then(response => response.json())
         .then(data => {
-            console.log(data); // Log the API response
-
-            // Clear previous markers
             markers.forEach(marker => map.removeLayer(marker));
             markers = []; // Reset the markers array
-
-            // Create a LatLng object for the user's location
             const userLocation = L.latLng(lat, lng);
 
-            // Extract restaurant coordinates from Overpass API response
             if (data.elements && data.elements.length > 0) {
-                data.elements.forEach(element => {
+                data.elements.forEach(async (element) => {
                     if (element.lat && element.lon) {
                         const restaurantLocation = L.latLng(element.lat, element.lon);
-                        
-                        // Calculate the distance from the user's location to the restaurant
                         const distance = userLocation.distanceTo(restaurantLocation);
-                        console.log(`Distance to restaurant (${element.lat}, ${element.lon}): ${distance} meters`);
 
-                        // Only add marker if within the specified radius
                         if (distance <= radius) {
-                            console.log(`Adding Marker: ${element.lat}, ${element.lon}`); // Log marker coordinates
-
-                            // Construct the popup content
                             const name = element.tags?.name || 'Unnamed Restaurant';
-                            
-                            // Custom classification for fast food
                             let classification = element.tags?.amenity || 'Unknown Classification';
                             if (classification === 'fast_food') {
                                 classification = 'Quick Service';
                             }
                             classification = capitalizeWords(classification);
-
                             const dietInfo = element.tags?.diet || 'No diets';
                             const address = element.tags?.address?.full || 'No address provided';
-                            const phone = element.tags?.phone || 'No phone number';
+                            const phone = element.tags?.phone || 'No phone number found';
                             const website = element.tags?.website || '#';
                             const openingHours = element.tags?.opening_hours || 'No hours provided';
 
-                            // Format the opening hours based on local time zone
-                            const formattedOpeningHours = formatOpeningHours(openingHours, lat, lng);
+                            // Fetch formatted opening hours
+                            const formattedOpeningHours = await formatOpeningHours(openingHours, element.lat, element.lon);
 
-                            const popupContent = `
-                                <span class="popup">
-                                    <h3>${name}</h3>
-                                    <p><strong>${classification}</strong></p>
-                                    <p><strong>${dietInfo} are currently welcome!</strong></p>
-                                    <button type="button" target="_blank">Order Online</button>
-                                    <p><strong>Address:</strong> ${address}</p>
-                                    <p><strong>Phone Number:</strong> <a href="tel:${phone}">${phone}</a></p>
-                                    ${website !== '#' ? `<p><strong>Website:</strong> <a href="${website}" target="_blank" rel="noopener noreferrer">${website}</a></p>` : '<p>No website available</p>'}
-                                    <p><strong>Open Hours:</strong> ${formattedOpeningHours}</p>
-                                </span>
-                            `;
+                            fetchMenuItems(name).then(items => {
+                                menuItems = items; // Store fetched menu items
+                                const priceRange = getPriceRange(menuItems); // Calculate price range
 
-                            const newMarker = L.marker([element.lat, element.lon])
-                                .addTo(map)
-                                .bindPopup(popupContent);
-                            markers.push(newMarker); // Store the marker
-                        } else {
-                            console.log(`Skipping restaurant (${element.lat}, ${element.lon}), distance: ${distance} meters`);
+                                const popupContent = `
+                                  <span class="popup">
+                                  <h3>${name}</h3>
+                                  <p><strong>${classification}</strong></p>
+                                  <p><strong>${dietInfo} are currently welcome!</strong></p>
+                                  ${priceRange ? `<p><strong>Price Range:</strong> ${priceRange}</p>` : ''}
+                                  <button type="button" onclick="openSideMenu('${name}', '${classification}', '${dietInfo}', '${address}', '${phone}', '${website}', '${formattedOpeningHours}')">Order Online</button>
+                                  ${address ? `<p><strong>Address:</strong> ${address}</p>` : ''}
+                                  ${phone ? `<p><strong>Phone Number:</strong> <a href="tel:${phone}">${phone}</a></p>` : ''}
+                                  ${website !== '#' ? `<p><strong>Website:</strong> <a href="${website}" target="_blank" rel="noopener noreferrer">${name}</a></p>` : ''}
+                                  ${formattedOpeningHours ? `<p><strong>Open Hours:</strong> ${formattedOpeningHours}</p>` : ''}
+                                  </span>
+                                `;
+
+                                const newMarker = L.marker([element.lat, element.lon])
+                                    .addTo(map)
+                                    .bindPopup(popupContent);
+                                markers.push(newMarker); // Store the marker
+                            });
                         }
                     }
                 });
@@ -195,6 +181,92 @@ function fetchRestaurants(lat, lng) {
         })
         .catch(error => console.error('Error fetching restaurant data:', error));
 }
+
+
+
+let currentRestaurant = {};
+let menuItems = []; // Store menu items
+
+function openSideMenu(name, classification, dietInfo, address, phone, website, openingHours) {
+    // Set the restaurant name
+    document.getElementById('restaurant-name').innerText = name;
+
+    // Fetch menu items (you may replace this with your actual menu fetching logic)
+    fetchMenuItems(name).then(items => {
+        menuItems = items; // Store fetched menu items
+        displayMenuItems(menuItems); // Display all items initially
+    });
+
+    document.getElementById('side-menu').style.display = 'block'; // Show the side menu
+}
+
+function fetchMenuItems(restaurantName) {
+    return new Promise(resolve => {
+        const exampleMenu = [
+            { id: 1, name: "Burger", category: "Main Course", price: 8.99 },
+            { id: 2, name: "Fries", category: "Sides", price: 2.99 },
+            { id: 3, name: "Salad", category: "Appetizers", price: 5.49 },
+            { id: 4, name: "Soda", category: "Drinks", price: 1.50 },
+            // Add more items as needed
+        ];
+        resolve(exampleMenu);
+    });
+}
+
+function getPriceRange(items) {
+    if (!items.length) return "Price not available";
+    
+    const prices = items.map(item => item.price);
+    const minPrice = Math.min(...prices).toFixed(2);
+    const maxPrice = Math.max(...prices).toFixed(2);
+    
+    return `$${minPrice} - $${maxPrice}`;
+}
+
+
+function displayMenuItems(items) {
+    const menuItemsDiv = document.getElementById('menu-items');
+    menuItemsDiv.innerHTML = ''; // Clear existing items
+
+    items.forEach(item => {
+        const itemDiv = document.createElement('div');
+        itemDiv.innerHTML = `
+            <label>
+                ${item.name} (${item.category})
+                <input type="number" min="0" value="0" class="item-quantity" data-item="${item.name}" />
+            </label>
+        `;
+        menuItemsDiv.appendChild(itemDiv);
+    });
+}
+function filterMenu() {
+    const query = document.getElementById('search-bar').value.toLowerCase();
+    const filteredItems = menuItems.filter(item => item.name.toLowerCase().includes(query));
+    displayMenuItems(filteredItems);
+}
+
+// Close menu functionality
+document.getElementById('close-menu').addEventListener('click', () => {
+    document.getElementById('side-menu').style.display = 'none'; // Hide the side menu
+});
+
+// Handle order submission
+document.getElementById('submit-order').addEventListener('click', () => {
+    const selectedItems = Array.from(document.querySelectorAll('#menu-items .item-quantity'))
+        .map(input => {
+            const quantity = parseInt(input.value);
+            const itemName = input.getAttribute('data-item');
+            return { name: itemName, quantity: quantity };
+        })
+        .filter(item => item.quantity > 0); // Filter out items with quantity 0
+
+    if (selectedItems.length > 0) {
+        alert(`Order submitted: ${selectedItems.map(item => `${item.name} (x${item.quantity})`).join(', ')}`);
+    } else {
+        alert('No items selected for order.');
+    }
+});
+
 
 /* Dropdown Filter Menu */
 /* When the user clicks on the button,

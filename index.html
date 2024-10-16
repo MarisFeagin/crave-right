@@ -81,6 +81,20 @@
     <!--Map-->
     <div id="map"></div>
 
+    <!--Order Menu-->
+    <div id="side-menu" class="side-menu" style="display: none;">
+      <button id="close-menu">Close</button>
+      <h2>Order from <span id="restaurant-name"></span></h2>
+      
+      <input type="text" id="search-bar" placeholder="Search menu items..." oninput="filterMenu()">
+      
+      <div id="menu-categories"></div>
+      
+      <div id="menu-items"></div>
+      
+      <button id="submit-order">Submit Order</button>
+    </div>
+    
     <!--Footer-->
     <footer class="nav">
         <div class="nav-content">
