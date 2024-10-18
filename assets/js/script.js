@@ -15,7 +15,7 @@ function error(err) {
     }
 }
 
-async function formatOpeningHours(openingHours, lat, lng) {
+async function formatOpeningHours(openingHours, _lat, _lng) {
     const { DateTime } = luxon;
 
     if (!openingHours || openingHours === 'No hours provided') {
@@ -125,27 +125,14 @@ function getSelectedBusinessTypes() {
 async function fetchRestaurants(lat, lng, selectedTypes) {
     const radius = 5000; // Search radius in meters
     const overpassUrl = 'https://lz4.overpass-api.de/api/interpreter';
-    
-    let overpassQuery;
 
-    // Construct Overpass query
-    if (selectedTypes && selectedTypes.length > 0) {
-        const businessTypes = selectedTypes.join('|');
-        overpassQuery = `
-            [out:json];
-            node["amenity"~"${businessTypes}"](around:${radius}, ${lat}, ${lng});
-            out;
-        `;
-    } else {
-        // Fetch all relevant amenities if no types are selected
-        overpassQuery = `
-            [out:json];
-            node["amenity"](around:${radius}, ${lat}, ${lng});
-            out;
-        `;
-    }
+    const allowedTypes = ['restaurant', 'cafe', 'bar', 'fast_food', 'grocery', 'fuel']; // Allowed types
 
-    console.log("Overpass Query:", overpassQuery); // Log the query
+    const overpassQuery = `
+        [out:json];
+        node["amenity"~"${allowedTypes.join('|')}"](around:${radius}, ${lat}, ${lng});
+        out;
+    `;
 
     try {
         const response = await fetch(overpassUrl + '?data=' + encodeURIComponent(overpassQuery));
@@ -157,7 +144,7 @@ async function fetchRestaurants(lat, lng, selectedTypes) {
         const userLocation = L.latLng(lat, lng);
 
         if (data.elements && data.elements.length > 0) {
-            data.elements.forEach(async (element) => {
+            for (const element of data.elements) {
                 if (element.lat && element.lon) {
                     const restaurantLocation = L.latLng(element.lat, element.lon);
                     const distance = userLocation.distanceTo(restaurantLocation);
@@ -175,32 +162,37 @@ async function fetchRestaurants(lat, lng, selectedTypes) {
                         // Fetch formatted opening hours
                         const formattedOpeningHours = await formatOpeningHours(openingHours, element.lat, element.lon);
 
-                        fetchMenuItems(name).then(items => {
-                            menuItems = items; // Store fetched menu items
-                            const priceRange = getPriceRange(menuItems); // Calculate price range
+                        // Fetch Menu Items Function
+                        // async function fetchMenuItems(_name) {
+                        //    const response = await fetch(`your-api-endpoint?name=${_name}`);
+                        //    if (!response.ok) throw new Error('Failed to fetch menu items');
+                        //    const data = await response.json();
+                        //    return data.items; // Assuming the structure contains 'items'
+                        // }
 
-                            const popupContent = `
-                              <span class="popup">
-                              <h3>${name}</h3>
-                              <p><strong>${classification}</strong></p>
-                              <p><strong>${dietInfo} are currently welcome!</strong></p>
-                              ${priceRange ? `<p><strong>Price Range:</strong> ${priceRange}</p>` : ''}
-                              <button type="button" onclick="openSideMenu('${name}', '${classification}', '${dietInfo}', '${address}', '${phone}', '${website}', '${formattedOpeningHours}')">Order Online</button>
-                              ${address ? `<p><strong>Address:</strong> ${address}</p>` : ''}
-                              ${phone ? `<p><strong>Phone Number:</strong> <a href="tel:${phone}">${phone}</a></p>` : ''}
-                              ${website !== '#' ? `<p><strong>Website:</strong> <a href="${website}" target="_blank" rel="noopener noreferrer">${name}</a></p>` : ''}
-                              ${formattedOpeningHours ? `<p><strong>Open Hours:</strong> ${formattedOpeningHours}</p>` : ''}
-                              </span>
-                            `;
+                        // const menuItems = await fetchMenuItems(name); // Await the fetched menu items
+                        // const priceRange = getPriceRange(menuItems); // Calculate price range 
 
-                            const newMarker = L.marker([element.lat, element.lon])
-                                .addTo(map)
-                                .bindPopup(popupContent);
-                            markers.push(newMarker); // Store the marker
-                        });
+                        const popupContent = `
+                            <span class="popup">
+                            <h3>${name}</h3>
+                            <p><strong>${classification}</strong></p>
+                            <p><strong>${dietInfo} are currently welcome!</strong></p>
+                            <button type="button" onclick="openSideMenu('${name}', '${classification}', '${dietInfo}', '${address}', '${phone}', '${website}', '${formattedOpeningHours}')">Order Online</button>
+                            ${address ? `<p><strong>Address:</strong> ${address}</p>` : ''}
+                            ${phone ? `<p><strong>Phone Number:</strong> <a href="tel:${phone}">${phone}</a></p>` : ''}
+                            ${website !== '#' ? `<p><strong>Website:</strong> <a href="${website}" target="_blank" rel="noopener noreferrer">${name}</a></p>` : ''}
+                            ${formattedOpeningHours ? `<p><strong>Open Hours:</strong> ${formattedOpeningHours}</p>` : ''}
+                            </span>
+                        `;
+
+                        const newMarker = L.marker([element.lat, element.lon])
+                            .addTo(map)
+                            .bindPopup(popupContent);
+                        markers.push(newMarker); // Store the marker
                     }
                 }
-            });
+            }
         } else {
             console.warn('No restaurants found in the area.');
         }
@@ -208,7 +200,8 @@ async function fetchRestaurants(lat, lng, selectedTypes) {
         console.error('Error fetching restaurant data:', error);
     }
   }
-})
+});
+
 
 // Event listener for the Search button
 document.querySelector('.submit').addEventListener('click', function(event) {
