@@ -64,13 +64,26 @@ async function formatOpeningHours(openingHours, _lat, _lng) {
 let menuItems = []; // Declare menuItems here
 
 // Initialize the map
-document.addEventListener('DOMContentLoaded', function() {var map = L.map('map').setView([39.38064969597025, -97.90948071443827], 5);
+document.addEventListener('DOMContentLoaded', function() {
+    var map = L.map('map').setView([39.38064969597025, -97.90948071443827], 5);
 
     var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     });
     
     osm.addTo(map);
+
+    // Default markers based on the initial allowed types
+    const defaultTypes = ['restaurant', 'cafe', 'bar', 'grocery', 'fuel', 'fast_food'];
+    fetchRestaurants(map, defaultTypes);
+ 
+    // Add event listeners for checkboxes
+    document.querySelectorAll('.dropdown-content input[type="checkbox"]').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const selectedTypes = getSelectedBusinessTypes();
+            fetchRestaurants(map, selectedTypes);
+        });
+    });
     
     // Geolocation variables
     let marker, circle, zoomed;
@@ -101,7 +114,8 @@ document.addEventListener('DOMContentLoaded', function() {var map = L.map('map')
         map.setView([lat, lng]);
     
         // Fetch and display restaurants after user location is obtained
-        fetchRestaurants(lat, lng);
+        const selectedTypes = getSelectedBusinessTypes(); // Get selected types here
+        fetchRestaurants(lat, lng, selectedTypes); // Pass selectedTypes to the function
     }
     
     function capitalizeWords(str) {
@@ -109,99 +123,96 @@ document.addEventListener('DOMContentLoaded', function() {var map = L.map('map')
             word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
         ).join(' ');
     }
+
+    // Function to get selected business types
+    function getSelectedBusinessTypes() {
+        const selectedTypes = [];
+        const checkboxes = document.querySelectorAll('.dropdown-content input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                selectedTypes.push(checkbox.value);
+            }
+        });
+        return selectedTypes.length > 0 ? selectedTypes : ['restaurant', 'cafe', 'bar', 'grocery', 'fuel', 'fast_food']; // Default types
+    }
     
-// Function to get selected business types
-function getSelectedBusinessTypes() {
-    const selectedTypes = [];
-    const checkboxes = document.querySelectorAll('.dropdown-content input[type="checkbox"]');
-    checkboxes.forEach(checkbox => {
-        if (checkbox.checked) {
-            selectedTypes.push(checkbox.value);
-        }
-    });
-    return selectedTypes;
-}
-
-async function fetchRestaurants(lat, lng, selectedTypes) {
-    const radius = 5000; // Search radius in meters
-    const overpassUrl = 'https://lz4.overpass-api.de/api/interpreter';
-
-    const allowedTypes = ['restaurant', 'cafe', 'bar', 'fast_food', 'grocery', 'fuel']; // Allowed types
-
-    const overpassQuery = `
-        [out:json];
-        node["amenity"~"${allowedTypes.join('|')}"](around:${radius}, ${lat}, ${lng});
-        out;
-    `;
-
-    try {
-        const response = await fetch(overpassUrl + '?data=' + encodeURIComponent(overpassQuery));
-        const data = await response.json();
-        
-        // Process the data
-        markers.forEach(marker => map.removeLayer(marker));
-        markers = []; // Reset the markers array
-        const userLocation = L.latLng(lat, lng);
-
-        if (data.elements && data.elements.length > 0) {
-            for (const element of data.elements) {
-                if (element.lat && element.lon) {
-                    const restaurantLocation = L.latLng(element.lat, element.lon);
-                    const distance = userLocation.distanceTo(restaurantLocation);
-
-                    if (distance <= radius) {
-                        const name = element.tags?.name || 'Unnamed Restaurant';
-                        let classification = element.tags?.amenity || 'Unknown Classification';
-                        classification = capitalizeWords(classification);
-                        const dietInfo = element.tags?.diet || 'No diets';
-                        const address = element.tags?.address?.full || 'No address provided';
-                        const phone = element.tags?.phone || 'No phone number found';
-                        const website = element.tags?.website || '#';
-                        const openingHours = element.tags?.opening_hours || 'No hours provided';
-
-                        // Fetch formatted opening hours
-                        const formattedOpeningHours = await formatOpeningHours(openingHours, element.lat, element.lon);
-
-                        // Fetch Menu Items Function
-                        // async function fetchMenuItems(_name) {
-                        //    const response = await fetch(`your-api-endpoint?name=${_name}`);
-                        //    if (!response.ok) throw new Error('Failed to fetch menu items');
-                        //    const data = await response.json();
-                        //    return data.items; // Assuming the structure contains 'items'
-                        // }
-
-                        // const menuItems = await fetchMenuItems(name); // Await the fetched menu items
-                        // const priceRange = getPriceRange(menuItems); // Calculate price range 
-
-                        const popupContent = `
-                            <span class="popup">
-                            <h3>${name}</h3>
-                            <p><strong>${classification}</strong></p>
-                            <p><strong>${dietInfo} are currently welcome!</strong></p>
-                            <button type="button" onclick="openSideMenu('${name}', '${classification}', '${dietInfo}', '${address}', '${phone}', '${website}', '${formattedOpeningHours}')">Order Online</button>
-                            ${address ? `<p><strong>Address:</strong> ${address}</p>` : ''}
-                            ${phone ? `<p><strong>Phone Number:</strong> <a href="tel:${phone}">${phone}</a></p>` : ''}
-                            ${website !== '#' ? `<p><strong>Website:</strong> <a href="${website}" target="_blank" rel="noopener noreferrer">${name}</a></p>` : ''}
-                            ${formattedOpeningHours ? `<p><strong>Open Hours:</strong> ${formattedOpeningHours}</p>` : ''}
-                            </span>
-                        `;
-
-                        const newMarker = L.marker([element.lat, element.lon])
-                            .addTo(map)
-                            .bindPopup(popupContent);
-                        markers.push(newMarker); // Store the marker
+    async function fetchRestaurants(lat, lng, selectedTypes) {
+        const radius = 5000; // Search radius in meters
+        const overpassUrl = 'https://lz4.overpass-api.de/api/interpreter';
+    
+        // Use selectedTypes, or fall back to defaultTypes if undefined or empty
+    const typesQuery = (selectedTypes && selectedTypes.length > 0) ? selectedTypes.join('|') : defaultTypes.join('|');
+    
+        // Construct the Overpass query
+        const overpassQuery = `
+            [out:json];
+            node["amenity"~"${typesQuery}"](around:${radius}, ${lat}, ${lng});
+            out;
+        `.trim();
+    
+        console.log('Overpass Query:', overpassQuery); // Log the query
+        const encodedQuery = encodeURIComponent(overpassQuery);
+        console.log('Encoded Query:', encodedQuery); // Log the encoded query
+    
+        try {
+            const response = await fetch(overpassUrl + '?data=' + encodedQuery);
+            if (!response.ok) throw new Error('Failed to fetch data'); // Handle non-200 responses
+            const data = await response.json();
+    
+            // Process the data
+            markers.forEach(marker => map.removeLayer(marker));
+            markers = []; // Reset the markers array
+            const userLocation = L.latLng(lat, lng);
+    
+            if (data.elements && data.elements.length > 0) {
+                for (const element of data.elements) {
+                    if (element.lat && element.lon) {
+                        const restaurantLocation = L.latLng(element.lat, element.lon);
+                        const distance = userLocation.distanceTo(restaurantLocation);
+    
+                        if (distance <= radius) {
+                            const name = element.tags?.name || 'Unnamed Restaurant';
+                            let classification = element.tags?.amenity || 'Unknown Classification';
+                            classification = capitalizeWords(classification);
+                            const dietInfo = element.tags?.diet || 'No diets';
+                            const address = element.tags?.address?.full || 'No address provided';
+                            const phone = element.tags?.phone || 'No phone number found';
+                            const website = element.tags?.website || '#';
+                            const openingHours = element.tags?.opening_hours || 'No hours provided';
+    
+                            // Fetch formatted opening hours
+                            const formattedOpeningHours = await formatOpeningHours(openingHours, element.lat, element.lon);
+    
+                            const popupContent = `
+                                <span class="popup">
+                                <h3>${name}</h3>
+                                <p><strong>${classification}</strong></p>
+                                <p><strong>${dietInfo} are currently welcome!</strong></p>
+                                <button type="button" onclick="openSideMenu('${name}', '${classification}', '${dietInfo}', '${address}', '${phone}', '${website}', '${formattedOpeningHours}')">Order Online</button>
+                                ${address ? `<p><strong>Address:</strong> ${address}</p>` : ''}
+                                ${phone ? `<p><strong>Phone Number:</strong> <a href="tel:${phone}">${phone}</a></p>` : ''}
+                                ${website !== '#' ? `<p><strong>Website:</strong> <a href="${website}" target="_blank" rel="noopener noreferrer">${name}</a></p>` : ''}
+                                ${formattedOpeningHours ? `<p><strong>Open Hours:</strong> ${formattedOpeningHours}</p>` : ''}
+                                </span>
+                            `;
+    
+                            const newMarker = L.marker([element.lat, element.lon])
+                                .addTo(map)
+                                .bindPopup(popupContent);
+                            markers.push(newMarker); // Store the marker
+                        }
                     }
                 }
+            } else {
+                console.warn('No restaurants found in the area.');
             }
-        } else {
-            console.warn('No restaurants found in the area.');
+        } catch (error) {
+            console.error('Error fetching restaurant data:', error);
         }
-    } catch (error) {
-        console.error('Error fetching restaurant data:', error);
     }
-  }
+    
 });
-
+    
 
 // Event listener for the Search button
 document.querySelector('.submit').addEventListener('click', function(event) {
