@@ -110,7 +110,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
         // Fetch and display restaurants after user location is obtained
         const selectedTypes = getSelectedBusinessTypes(); // Get selected types here
-        console.log('Selected Types:', selectedTypes); // Log selected types
     
         // Call fetchRestaurants with proper lat, lng, and selected types
         fetchRestaurants(lat, lng, selectedTypes); 
@@ -140,7 +139,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if ("geolocation" in navigator) {
             navigator.geolocation.getCurrentPosition(async (position) => {
                 const { latitude, longitude } = position.coords;
-                console.log('Latitude:', latitude, 'Longitude:', longitude);
                 
                 if (latitude && longitude) {
                     await fetchRestaurants(latitude, longitude, selectedTypes);
@@ -162,7 +160,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if ("geolocation" in navigator) {
             watchId = navigator.geolocation.watchPosition((position) => {
                 const { latitude, longitude } = position.coords;
-                console.log('Latitude:', latitude, 'Longitude:', longitude);
                 fetchRestaurants(latitude, longitude, selectedTypes);
             }, (error) => {
                 console.error('Error watching location:', error);
@@ -180,8 +177,6 @@ startWatchingPosition();
 async function fetchRestaurants(lat, lng, selectedTypes) {
     lat = Number(lat);
     lng = Number(lng);
-
-    console.log('Input Latitude:', lat, 'Input Longitude:', lng);
     
     if (isNaN(lat) || isNaN(lng)) {
         console.error('Invalid Latitude or Longitude:', lat, lng);
@@ -225,7 +220,7 @@ async function fetchRestaurants(lat, lng, selectedTypes) {
                                 classification = capitalizeWords(classification);
                                 const dietInfo = element.tags?.diet || 'No diets';
                                 const address = element.tags?.address?.full || 'No address provided';
-                                const phone = element.tags?.phone || 'No phone number found';
+                                const phone = element.tags?.phone || '#';
                                 const website = element.tags?.website || '#';
                                 const openingHours = element.tags?.opening_hours || 'No hours provided';
         
