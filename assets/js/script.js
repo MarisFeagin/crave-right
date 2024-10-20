@@ -4,7 +4,7 @@ const output = document.getElementById("demo");
 output.innerHTML = slider.value;
 
 slider.oninput = () => {
-    output.innerHTML = this.value;
+    output.innerHTML = slider.value;
 };
 
 // Geolocation Error Handling
@@ -76,7 +76,6 @@ document.addEventListener('DOMContentLoaded', () => {
     async function fetchRestaurants(lat, lng, selectedTypes) {
         const radius = 5000;
         const overpassUrl = 'https://lz4.overpass-api.de/api/interpreter';
-
         const typesQuery = selectedTypes.join('|');
         const overpassQuery = `
             [out:json];
@@ -103,10 +102,10 @@ document.addEventListener('DOMContentLoaded', () => {
                             const name = element.tags?.name || 'Unnamed Restaurant';
                             const classification = capitalizeWords(element.tags?.amenity || 'Unknown Classification');
                             const dietInfo = element.tags?.diet || 'No diets';
-                            const address = element.tags?.address?.full || 'No address provided';
-                            const phone = element.tags?.phone || '#';
+                            const address = element.tags?.address?.full || 'No Address Provided';
+                            const phone = element.tags?.phone || 'No Phone Number Provided';
                             const website = element.tags?.website || '#';
-                            const openingHours = element.tags?.opening_hours || 'No hours provided';
+                            const openingHours = element.tags?.opening_hours || 'No Hours Provided';
                             const formattedOpeningHours = await formatOpeningHours(openingHours, element.lat, element.lon);
 
                             const popupContent = `
@@ -135,6 +134,48 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Helper Functions
+    function capitalizeWords(str) {
+        return str.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+    }
+
+    function getSelectedBusinessTypes() {
+        const selectedTypes = Array.from(document.querySelectorAll('.dropdown-content input[type="checkbox"]:checked')).map(cb => cb.value);
+        return selectedTypes.length > 0 ? selectedTypes : ['restaurant', 'cafe', 'bar', 'grocery', 'fuel', 'fast_food'];
+    }
+
+    // Function to show all markers
+    function showAllMarkers() {
+        markers.forEach(marker => map.addLayer(marker));
+    }
+
+    // Debounce function
+    function debounce(func, delay) {
+        let timeout;
+        return function(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), delay);
+        };
+    }
+
+    // Function to filter and show markers based on the search term
+    function showFilteredMarkers(searchTerm) {
+        markers.forEach(marker => {
+            const popupContent = marker.getPopup().getContent();
+            const nameMatch = popupContent.match(/<h3>(.*?)<\/h3>/);
+            
+            if (nameMatch) {
+                const name = nameMatch[1].toLowerCase();
+                const isMatch = name.includes(searchTerm);
+                if (isMatch) {
+                    map.addLayer(marker);
+                } else {
+                    map.removeLayer(marker);
+                }
+            }
+        });
+    }
+
     // Event Listeners
     document.querySelector('.submit').addEventListener('click', event => {
         event.preventDefault();
@@ -154,10 +195,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    document.querySelector('#search').addEventListener('input', function() {
+    document.querySelector('#search').addEventListener('input', debounce(function() {
         const searchTerm = this.value.toLowerCase().trim();
-        searchTerm === '' ? showAllMarkers() : showFilteredMarkers(searchTerm);
-    });
+        showFilteredMarkers(searchTerm);
+    }, 300)); // 300 ms delay for debounce
 
     document.querySelector('.clear-search').addEventListener('click', function() {
         document.querySelector('#search').value = '';
@@ -172,33 +213,21 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     };
+
+    // CSS for highlighting matches
+    const style = document.createElement('style');
+    style.innerHTML = `
+        .highlight {
+            background-color: yellow; /* Change to desired highlight color */
+            border-radius: 5px; /* Optional */
+        }
+    `;
+    document.head.appendChild(style);
 });
 
-// Helper Functions
-function capitalizeWords(str) {
-    return str.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
-}
-
-function getSelectedBusinessTypes() {
-    const selectedTypes = Array.from(document.querySelectorAll('.dropdown-content input[type="checkbox"]:checked')).map(cb => cb.value);
-    return selectedTypes.length > 0 ? selectedTypes : ['restaurant', 'cafe', 'bar', 'grocery', 'fuel', 'fast_food'];
-}
-
-function showAllMarkers() {
-    markers.forEach(marker => map.addLayer(marker));
-}
-
-function showFilteredMarkers(searchTerm) {
-    markers.forEach(marker => {
-        const popupContent = marker.getPopup().getContent();
-        const name = popupContent.match(/<h3>(.*?)<\/h3>/)[1];
-        const isMatch = name.toLowerCase().includes(searchTerm);
-        isMatch ? map.addLayer(marker) : map.removeLayer(marker);
-    });
-}
-
-// Toggle Dropdown Function
+// Toggle Dropdown Function (if necessary)
 function toggleDropdown() {
     document.getElementById("myDropdown").classList.toggle("show");
 }
+
 
