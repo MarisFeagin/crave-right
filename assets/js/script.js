@@ -55,6 +55,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function success(pos) {
         const { latitude, longitude, accuracy } = pos.coords;
+        const selectedBusinessTypes = getSelectedBusinessTypes(); // Get selected types initially
+
+    // Only fetch if any types are selected
+    if (selectedBusinessTypes.length > 0) {
+        fetchRestaurants(initialLat, initialLng, selectedBusinessTypes); // Replace with actual initial coords
+    }
 
         if (userMarker) {
             map.removeLayer(userMarker);
@@ -76,38 +82,44 @@ document.addEventListener('DOMContentLoaded', () => {
     async function fetchRestaurants(lat, lng, selectedTypes) {
         const radius = 5000;
         const overpassUrl = 'https://lz4.overpass-api.de/api/interpreter';
+    
+        // Create the query for the selected amenity types
         const typesQuery = selectedTypes.join('|');
+    
         const overpassQuery = `
             [out:json];
             node["amenity"~"${typesQuery}"](around:${radius},${lat},${lng});
             out;
         `.trim();
-
+    
+        console.log("Fetching with query:", overpassQuery); // Log the query
+    
         try {
             const response = await fetch(`${overpassUrl}?data=${encodeURIComponent(overpassQuery)}`);
             if (!response.ok) throw new Error(`Network response was not ok: ${response.statusText}`);
-
+    
             const data = await response.json();
             markers.forEach(marker => map.removeLayer(marker));
             markers = [];
-
+    
             if (data.elements && data.elements.length > 0) {
                 const userLocation = L.latLng(lat, lng);
-                data.elements.forEach(async (element) => {
+                for (const element of data.elements) {
                     if (element.lat && element.lon) {
+                        const markerType = element.tags?.amenity || 'Unknown Classification';
                         const restaurantLocation = L.latLng(element.lat, element.lon);
                         const distance = userLocation.distanceTo(restaurantLocation);
-
+    
                         if (distance <= radius) {
-                            const name = element.tags?.name || 'Unnamed Restaurant';
-                            const classification = capitalizeWords(element.tags?.amenity || 'Unknown Classification');
+                            const name = element.tags?.name || 'Unnamed Location';
+                            const classification = capitalizeWords(markerType);
                             const dietInfo = element.tags?.diet || 'No diets';
                             const address = element.tags?.address?.full || 'No Address Provided';
                             const phone = element.tags?.phone || 'No Phone Number Provided';
                             const website = element.tags?.website || '#';
                             const openingHours = element.tags?.opening_hours || 'No Hours Provided';
                             const formattedOpeningHours = await formatOpeningHours(openingHours, element.lat, element.lon);
-
+    
                             const popupContent = `
                                 <span class="popup">
                                     <h3>${name}</h3>
@@ -120,30 +132,52 @@ document.addEventListener('DOMContentLoaded', () => {
                                     ${formattedOpeningHours ? `<p><strong>Open Hours:</strong> ${formattedOpeningHours}</p>` : ''}
                                 </span>
                             `;
-
-                            const newMarker = L.marker([element.lat, element.lon]).addTo(map).bindPopup(popupContent);
+    
+                            const newMarker = L.marker([element.lat, element.lon], { businessType: markerType })
+                                .addTo(map)
+                                .bindPopup(popupContent);
                             markers.push(newMarker);
                         }
                     }
-                });
+                }
+                filterMarkersByBusinessType(selectedTypes); // Call filtering after fetching
             } else {
-                console.warn('No restaurants found in the area.');
+                console.warn('No locations found in the area.');
             }
         } catch (error) {
-            console.error('Error fetching restaurant data:', error);
+            console.error('Error fetching location data:', error);
         }
     }
-
+    
+    
     // Helper Functions
     function capitalizeWords(str) {
         return str.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
     }
 
     function getSelectedBusinessTypes() {
-        const selectedTypes = Array.from(document.querySelectorAll('.dropdown-content input[type="checkbox"]:checked')).map(cb => cb.value);
-        return selectedTypes.length > 0 ? selectedTypes : ['restaurant', 'cafe', 'bar', 'grocery', 'fuel', 'fast_food'];
+        const selectedTypes = Array.from(document.querySelectorAll('.dropdown-content input[type="checkbox"]:checked'))
+            .map(cb => cb.value);
+        return selectedTypes; // Returns an array of selected business types
     }
 
+    function filterMarkersByBusinessType(selectedTypes) {
+        if (selectedTypes.length === 0) {
+            // Show all markers if no business types are selected
+            markers.forEach(marker => map.addLayer(marker));
+        } else {
+            // Show only markers that match the selected types
+            markers.forEach(marker => {
+                const markerType = marker.options.businessType; // Access the business type
+                if (selectedTypes.includes(markerType)) {
+                    map.addLayer(marker);
+                } else {
+                    map.removeLayer(marker);
+                }
+            });
+        }
+    }
+    
     // Function to show all markers
     function showAllMarkers() {
         markers.forEach(marker => map.addLayer(marker));
@@ -181,11 +215,16 @@ document.addEventListener('DOMContentLoaded', () => {
         event.preventDefault();
         const searchTerm = document.querySelector('#search').value.toLowerCase().trim();
         const selectedBusinessTypes = getSelectedBusinessTypes();
-
+    
+        if (selectedBusinessTypes.length === 0) {
+            console.warn('No business types selected. Please select at least one.');
+            return; // Prevent fetching if no types are selected
+        }
+    
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(position => {
                 const { latitude, longitude } = position.coords;
-                fetchRestaurants(latitude, longitude, selectedBusinessTypes);
+                fetchRestaurants(latitude, longitude, selectedBusinessTypes); // Use selected types here
                 showFilteredMarkers(searchTerm);
             }, () => {
                 console.error("Geolocation permission denied.");
@@ -194,7 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error("Geolocation is not supported by this browser.");
         }
     });
-
+    
     document.querySelector('#search').addEventListener('input', debounce(function() {
         const searchTerm = this.value.toLowerCase().trim();
         showFilteredMarkers(searchTerm);
@@ -203,6 +242,15 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('.clear-search').addEventListener('click', function() {
         document.querySelector('#search').value = '';
         showAllMarkers();
+    });
+
+    // Add event listeners to checkboxes
+    const checkboxes = document.querySelectorAll('.dropdown-content input[type="checkbox"]');
+    checkboxes.forEach(checkbox => {
+      checkbox.addEventListener('change', () => {
+        const selectedBusinessTypes = getSelectedBusinessTypes();
+        filterMarkersByBusinessType(selectedBusinessTypes);
+      });
     });
 
     // Dropdown Menu
