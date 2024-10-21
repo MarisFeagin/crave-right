@@ -78,13 +78,16 @@ document.addEventListener('DOMContentLoaded', () => {
         fetchRestaurants(latitude, longitude, getSelectedBusinessTypes());
     }
 
+    // Define the business types to be fetched if no checkboxes are selected
+    const defaultBusinessTypes = ['restaurant', 'cafe', 'bar', 'fast_food', 'ice_cream', 'gas_station'];
+
     // Fetch Restaurants Function
     async function fetchRestaurants(lat, lng, selectedTypes) {
-        const radius = 5000;
+        const radius = 4000;
         const overpassUrl = 'https://lz4.overpass-api.de/api/interpreter';
     
-        // Create the query for the selected amenity types
-        const typesQuery = selectedTypes.join('|');
+        // Use the selected types or default if none are selected
+        const typesQuery = selectedTypes.length > 0 ? selectedTypes.join('|') : defaultBusinessTypes.join('|');
     
         const overpassQuery = `
             [out:json];
@@ -100,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
             const data = await response.json();
             markers.forEach(marker => map.removeLayer(marker));
-            markers = [];
+            markers = []; // Reset markers array
     
             if (data.elements && data.elements.length > 0) {
                 const userLocation = L.latLng(lat, lng);
@@ -155,10 +158,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return str.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
     }
 
+    // Function to get selected business types from checkboxes
     function getSelectedBusinessTypes() {
-        const selectedTypes = Array.from(document.querySelectorAll('.dropdown-content input[type="checkbox"]:checked'))
-            .map(cb => cb.value);
-        return selectedTypes; // Returns an array of selected business types
+    return Array.from(document.querySelectorAll('.dropdown-content input[type="checkbox"]:checked'))
+        .map(cb => cb.value);
     }
 
     function filterMarkersByBusinessType(selectedTypes) {
@@ -213,19 +216,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // Event Listeners
     document.querySelector('.submit').addEventListener('click', event => {
         event.preventDefault();
-        const searchTerm = document.querySelector('#search').value.toLowerCase().trim();
+        
+        // Get selected business types from checkboxes
         const selectedBusinessTypes = getSelectedBusinessTypes();
-    
-        if (selectedBusinessTypes.length === 0) {
-            console.warn('No business types selected. Please select at least one.');
-            return; // Prevent fetching if no types are selected
-        }
     
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(position => {
                 const { latitude, longitude } = position.coords;
-                fetchRestaurants(latitude, longitude, selectedBusinessTypes); // Use selected types here
-                showFilteredMarkers(searchTerm);
+                fetchRestaurants(latitude, longitude, selectedBusinessTypes); // Use selected types or defaults
             }, () => {
                 console.error("Geolocation permission denied.");
             });
@@ -247,11 +245,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Add event listeners to checkboxes
     const checkboxes = document.querySelectorAll('.dropdown-content input[type="checkbox"]');
     checkboxes.forEach(checkbox => {
-      checkbox.addEventListener('change', () => {
+    checkbox.addEventListener('change', () => {
         const selectedBusinessTypes = getSelectedBusinessTypes();
-        filterMarkersByBusinessType(selectedBusinessTypes);
-      });
+        filterMarkersByBusinessType(selectedBusinessTypes); // Filter markers based on selected types
     });
+});
 
     // Dropdown Menu
     window.onclick = function(event) {
