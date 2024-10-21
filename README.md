@@ -13,7 +13,7 @@ Crave Right is a Nutrition-based Navigator service that helps you find the best 
 - Users can rate businesses on variety, hospitality, taste, atmosphere, and which diets and allergies are most welcome.
 
 ## Mission
-Often businesses do not display how their food is cooked in the most accessible manner. Our goal is for those partaking in the wonderful world of take-out or sit-down dining to understand what they fuel themselves with to prevent future guilt in the restroom or allergic out breaks.
+Often businesses do not display how their food is cooked in the most accessible manner. So our goal is for those partaking in the wonderful world of take-out or sit-down dining to understand what they fuel themselves with to prevent future guilt in the restroom or allergic out breaks.
 
 ## Resources
 - LeafletJS Map API: (https://leafletjs.com)
