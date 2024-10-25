@@ -12,59 +12,16 @@
     <h1 class="header">Crave Right</h3>
     <!--About-->
 <!--Map Search-->
-<main class="search form">
-  <div class="filters">
-    <h1 class="header">Crave Right</h3>
-    <form id="nav" class="search cats">
-        <!--Search Bar-->
-        <input type="search" id="search" name="search" placeholder="Your next meal...">
-        <!--Filters-->
-        <!--Diets-->
-        <div class="dropdown">
-            <button class="dropbtn">Diet</button>
-            <div class="dropdown-content">
-              <label class="diets">High-Protein</label><input type="checkbox" name="high-protein" id="diet" value="high-protein" />
-              <label class="diets">High-Fiber</label><input type="checkbox" name="high-fiber" id="diet" value="high-fiber" />
-              <label class="diets">Low-Carb</label><input type="checkbox" name="low-carb" id="diet" value="low-carb" />
-              <label class="diets">Vegan</label><input type="checkbox" name="vegan" id="diet" value="vegan" />
-              <label class="diets">Vegetarian</label><input type="checkbox" name="vegetarian" id="diet" value="vegetarian" />
-              <label class="diets">Pescatarian</label><input type="checkbox" name="pescatarian" id="diet" value="pescatarian" />
-              <label class="diets">Keto</label><input type="checkbox" name="keto" id="diet" value="keto" />
-              <label class="diets">Paleo</label><input type="checkbox" name="paleo" id="diet" value="paleo" />
-              <label class="diets">Kosher</label><input type="checkbox" name="kosher" id="diet" value="kosher" />
-              <label class="diets">Organic</label><input type="checkbox" name="organic" id="diet" value="organic" />
-              <label class="diets">Carnivore</label><input type="checkbox" name="carnivore" id="diet" value="carnivore" />
-              <label class="diets">Raw</label><input type="checkbox" name="raw" id="diet" value="raw" />
-              <label class="diets">Non-Dairy</label><input type="checkbox" name="non-dairy" id="diet" value="non-dairy" />
-              <label class="diets">Anti-Inflammatory</label><input type="checkbox" name="anti-inflammatory" id="diet" value="anti-inflam" />
-          </div>
-        <!--Allergies-->
-          <div class="dropdown">
-            <button class="dropbtn">Allergens</button>
-            <div class="dropdown-content">
-                <label class="allergens">Milk</label><input type="checkbox" name="milk" id="allergy" value="milk" />
-                <label class="allergens">Eggs</label><input type="checkbox" name="eggs" id="allergy" value="eggs" />
-                <label class="allergens">Fish</label><input type="checkbox" name="fish" id="allergy" value="fish" />
-                <label class="allergens">Crustacean Shellfish</label><input type="checkbox" name="crustacean-shellfish" id="allergy" value="crustacean-shellfish" />
-                <label class="allergens">Tree Nuts</label><input type="checkbox" name="tree-nuts" id="allergy" value="tree-nuts" />
-                <label class="allergens">Peanuts</label><input type="checkbox" name="peanuts" id="allergy" value="peanuts" />
-                <label class="allergens">Wheat</label><input type="checkbox" name="wheat" id="allergy" value="wheat" />
-                <label class="allergens">Soy</label><input type="checkbox" name="soy" id="allergy" value="soy" />
-                <label class="allergens">Sesame</label><input type="checkbox" name="sesame" id="allergy" value="sesame" />
-          </div>
-        </div>
-        <!--Calories and Price Ranges-->
-        <div class="slidecontainer">
-            <label class="slider">Calories Per Meal</label><input type="range" min="100" max="2500" value="500" class="slider" id="calories-per-meal" />
-          </div>
-          <div class="slidecontainer">
-            <label class="slider">Price Per Meal</label><input type="range" min="1" max="100" value="10" class="slider" id="price-range" />
-          </div>
-    </form>
-  </div>
-  <div>
-    
-  </div>
+<main>
+  <h1>Crave Right Database Entry:</h1>
+  <h2>Nutirition Information</h2>
+  <form id="labelForm">
+    <input type="text" id="productName" placeholder="Product Name" required />
+    <input type="text" id="servingSize" placeholder="Serving Size" required />
+    <input type="number" id="calories" placeholder="Calories" required />
+    <button type="submit">Add/Update Label</button>
+</form>
+<div id="labelsList"></div>
 </main>
     <!--Contact-->
 
@@ -81,5 +38,60 @@
            <p class="nav-p">&copy; All Rights Reserved Crave Right, 2024</p>
         </div>
      </footer>
+     
+    <!--Javascript-->
+     <script>
+      const labelsList = document.getElementById('labelsList');
+      const labelForm = document.getElementById('labelForm');
+
+      async function fetchLabels() {
+          const response = await fetch('http://localhost:3000/api/labels');
+          const labels = await response.json();
+          displayLabels(labels);
+      }
+
+      function displayLabels(labels) {
+          labelsList.innerHTML = '';
+          labels.forEach(label => {
+              const div = document.createElement('div');
+              div.innerHTML = `
+                  <h3>${label.productName}</h3>
+                  <p>Serving Size: ${label.servingSize}</p>
+                  <p>Calories: ${label.nutrients.calories}</p>
+                  <button onclick="editLabel(${label.id})">Edit</button>
+              `;
+              labelsList.appendChild(div);
+          });
+      }
+
+      labelForm.addEventListener('submit', async (event) => {
+          event.preventDefault();
+          const newLabel = {
+              productName: document.getElementById('productName').value,
+              servingSize: document.getElementById('servingSize').value,
+              nutrients: {
+                  calories: parseInt(document.getElementById('calories').value),
+              }
+          };
+          await fetch('http://localhost:3000/api/labels', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(newLabel)
+          });
+          labelForm.reset();
+          fetchLabels();
+      });
+
+      async function editLabel(id) {
+          const label = await (await fetch(`http://localhost:3000/api/labels/${id}`)).json();
+          document.getElementById('productName').value = label.productName;
+          document.getElementById('servingSize').value = label.servingSize;
+          document.getElementById('calories').value = label.nutrients.calories;
+          // Add logic to update an existing label here...
+      }
+
+      // Initial fetch
+      fetchLabels();
+  </script>
 </body>
 </html>
