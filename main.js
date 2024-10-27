@@ -1,4 +1,4 @@
-const express = require('express')();
+const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
@@ -9,19 +9,36 @@ app.use( cors() );
 app.use( bodyParser.json() );
 
 let nutritionLabels = [
-
+    {
+        "productName": "Test Product",
+        "servingSize": "1 cup",
+        "nutrients": {
+            "calories": 100
+        }
+    }
 ];
 
-// 'Disclaimer': `Crave Right does not claim to recommend diets nor nutrition advice to any of our users. We only arm you with the knowledge of a food's value and numbers. Please meet with a lincesed dietian and/or nutritionist for your individual comsumption needs. Everyone will require a different plan. Please consume responsibly!`
 
-// Get Labels
+// Get All Labels
 app.get('/api/labels', (req, res) => {
     res.json(nutritionLabels);
 });
 
+// Get Label by ID
+app.get('/api/labels/:id', (req, res) => {
+    const { id } = req.params; // Get the ID from the request parameters
+    const label = nutritionLabels.find(label => label.id == id); // Find the label by ID
+
+    if (label) {
+        res.json(label); // Return the label if found
+    } else {
+        res.status(404).json({ message: 'Label not found' }); // Return 404 if not found
+    }
+});
+
 // Add new label
 app.post('/api/labels', (req, res) => {
-    const newLabel = { id: Date.now(), ...req.body };
+    const newLabel = { id: Date.now().toString(), ...req.body }; // Ensure ID is a string
     nutritionLabels.push(newLabel);
     res.status(201).json(newLabel);
 });
@@ -31,7 +48,7 @@ app.put('/api/label/:id', (req, res) => {
     const { id } = req.params;
     const index = nutritionLabels.findIndex(label => label.id == id);
     if (index !== -1) {
-        nutritionLabels[index] = { id: parseInt(id), ...req.body };
+        nutritionLabels[index] = { id: id, ...req.body }; // Keep the ID as it is
         res.json(nutritionLabels[index]);
     } else {
         res.status(404).json({ message: 'Label not found' });
@@ -42,3 +59,5 @@ app.put('/api/label/:id', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+app.get("hello",(req,res)=>res.send("hi there"))

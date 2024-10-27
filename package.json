@@ -4,6 +4,8 @@
   "description": "Crave Right is a Nutrition-based Navigator service that helps you find the best restuarants, grocery stores, and local businesses according to your dietary and allergy needs.",
   "main": "index.js",
   "scripts": {
+    "dev-backend": "node --watch main.js",
+    "backend": "main.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
