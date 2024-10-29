@@ -23,7 +23,7 @@ app.get('/api/labels/:id', (req, res) => {
     const { id } = req.params; // Get the ID from the request parameters
     console.log(`Fetching label with ID: ${id}`);
     
-    const label = nutritionLabels.find(label => label.id == id); // Find the label by ID
+    const label = nutritionLabels.find(label => label.id === id); // Find the label by ID
 
     if (label) {
         res.json(label);

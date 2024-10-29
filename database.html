@@ -39,7 +39,6 @@
      </footer>
      
     <!--Javascript-->
-    <script src="main.js"></script>
      <script>
       const labelsList = document.getElementById('labelsList');
       const labelForm = document.getElementById('labelForm');
@@ -114,30 +113,27 @@
 }
 
 
-      async function editLabel(id) {
-        console.log(`Editing label with ID: ${id}`); // Log the ID being used
+async function editLabel(id) {
+            console.log(`Editing label with ID: ${id}`);
+            try {
+                const response = await fetch(`http://localhost:3000/api/labels/${id}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
 
-        if (!id) {
-        console.error('No ID provided for editLabel'); // Log if ID is undefined
-        return;
-    }
-        try {
-        const response = await fetch(`http://localhost:3000/api/labels/${id}`);
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+                const label = await response.json();
+                document.getElementById('productName').value = label.productName;
+                document.getElementById('servingSize').value = label.servingSize;
+                document.getElementById('calories').value = label.nutrients.calories;
+
+                // Optionally: Change the button text to indicate updating
+                labelForm.querySelector('button').textContent = 'Update Label';
+
+                // Add logic to update the existing label in your API if needed
+            } catch (error) {
+                console.error('Error fetching label:', error);
+            }
         }
-
-        const label = await response.json();
-        document.getElementById('productName').value = label.productName;
-        document.getElementById('servingSize').value = label.servingSize;
-        document.getElementById('calories').value = label.nutrients.calories;
-        
-        // Add logic to update an existing label here...
-       } catch (error) {
-        console.error('Error fetching label:', error);
-    }
-      }
 
       // Initial fetch
       fetchLabels();
