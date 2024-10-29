@@ -8,31 +8,28 @@ const PORT = 3000;
 app.use( cors() );
 app.use( bodyParser.json() );
 
-let nutritionLabels = [
-    {
-        "productName": "Test Product",
-        "servingSize": "1 cup",
-        "nutrients": {
-            "calories": 100
-        }
-    }
-];
+// User input data stored as labels
+let nutritionLabels = [];
 
 
 // Get All Labels
 app.get('/api/labels', (req, res) => {
+    console.log('Fetching all labels');
     res.json(nutritionLabels);
 });
 
 // Get Label by ID
 app.get('/api/labels/:id', (req, res) => {
     const { id } = req.params; // Get the ID from the request parameters
+    console.log(`Fetching label with ID: ${id}`);
+    
     const label = nutritionLabels.find(label => label.id == id); // Find the label by ID
 
     if (label) {
-        res.json(label); // Return the label if found
+        res.json(label);
     } else {
-        res.status(404).json({ message: 'Label not found' }); // Return 404 if not found
+        console.error(`Label with ID ${id} not found`);
+        res.status(404).json({ message: 'Label not found' });
     }
 });
 
@@ -44,7 +41,7 @@ app.post('/api/labels', (req, res) => {
 });
 
 // Update existing label
-app.put('/api/label/:id', (req, res) => {
+app.put('/api/labels/:id', (req, res) => {
     const { id } = req.params;
     const index = nutritionLabels.findIndex(label => label.id == id);
     if (index !== -1) {
@@ -60,4 +57,3 @@ app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
 
-app.get("hello",(req,res)=>res.send("hi there"))
