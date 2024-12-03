@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crave Right</title>
+    <link rel="icon" href="assets/images/Crave%20Right%20logo.svg" type="image/icon svg">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/luxon/3.5.0/luxon.min.js" integrity="sha512-SN7iwxiJt9nFKiLayg3NjLItXPwRfBr4SQSIugMeBFrD4lIFJe1Z/exkTZYAg3Ul+AfZEGws2PQ+xSoaWfxRQQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/luxon/2.3.0/luxon.min.js"></script>
+</head>
+<body>
+        <!--Header-->
+        <div class="header">
+          <h1 class="header">Crave Right</h1><img src="assets/images/Crave%20Right%20logo.png" class="header" height="60px" weight="60px">
+        </div>
+      
+        <!--Map Search-->
+        <main class="search-form">
+            <form id="nav" class="search-cats">
+                <!--Search Bar-->
+                <input type="search" class="search-bar" id="search" name="search" placeholder="Your next meal...">
+                <button type="submit" class="submit">Search</button>
+                <button type="button" class="clear-search">Clear Search</button>
+                <!--Filters-->
+                <div class="dropdown">
+                  <button class="dropbtn">Diets and Allergens</button>
+                  <div class="dropdown-content">
+                    <h3 class="diets">Diets:</h3>
+                     <label class="diets">High-Protein</label><input type="checkbox" name="high-protein" id="high-protein" value="high-protein" />
+                     <label class="diets">High-Fiber</label><input type="checkbox" name="high-fiber" id="high-fiber" value="high-fiber" />
+                     <label class="diets">Low-Carb</label><input type="checkbox" name="low-carb" id="low-carb" value="low-carb" /><br>
+                     <label class="diets">Vegan</label><input type="checkbox" name="vegan" id="vegan" value="vegan" />
+                     <label class="diets">Vegetarian</label><input type="checkbox" name="vegetarian" id="vegetarian" value="vegetarian" />
+                     <label class="diets">Pescatarian</label><input type="checkbox" name="pescatarian" id="pescatarian" value="pescatarian" /><br>
+                     <label class="diets">Keto</label><input type="checkbox" name="keto" id="keto" value="keto" />
+                     <label class="diets">Paleo</label><input type="checkbox" name="paleo" id="paleo" value="paleo" />
+                     <label class="diets">Kosher</label><input type="checkbox" name="kosher" id="kosher" value="kosher" /><br>
+                     <label class="diets">Organic</label><input type="checkbox" name="organic" id="organic" value="organic" />
+                     <label class="diets">Carnivore</label><input type="checkbox" name="carnivore" id="carnivore" value="carnivore" />
+                     <label class="diets">Raw</label><input type="checkbox" name="raw" id="raw" value="raw" /><br>
+                     <label class="diets">Non-Dairy</label><input type="checkbox" name="non-dairy" id="non-dairy" value="non-dairy" />
+                     <label class="diets">Anti-Inflammatory</label><input type="checkbox" name="anti-inflammatory" id="anti-inflam" value="anti-inflam" />
+                     <h3 class="allergens">Allergens:</h3>
+                     <label class="allergens">Milk</label><input type="checkbox" name="milk" id="milk" value="milk" />
+                     <label class="allergens">Eggs</label><input type="checkbox" name="eggs" id="eggs" value="eggs" />
+                     <label class="allergens">Wheat</label><input type="checkbox" name="wheat" id="wheat" value="wheat" />
+                     <label class="allergens">Soy</label><input type="checkbox" name="soy" id="soy" value="soy" /><br>
+                     <label class="allergens">Fish</label><input type="checkbox" name="fish" id="fish" value="fish" />
+                     <label class="allergens">Crustacean</label><input type="checkbox" name="crustacean" id="crustacean" value="crustacean" />
+                     <label class="allergens">Shellfish</label><input type="checkbox" name="shellfish" id="shellface" value="shellface" /><br>
+                     <label class="allergens">Tree Nuts</label><input type="checkbox" name="tree-nuts" id="tree-nuts" value="tree-nuts" />
+                     <label class="allergens">Peanuts</label><input type="checkbox" name="peanuts" id="peanuts" value="peanuts" />
+                     <label class="allergens">Legumes</label><input type="checkbox" name="Legumes" id="Legumes" value="Legumes" />
+                     <label class="allergens">Sesame</label><input type="checkbox" name="sesame" id="sesame" value="sesame" />
+                  </div>
+                </div>
+
+                <div class="dropdown">
+                  <button class="dropbtn">Type of Business</button>
+                  <div class="dropdown-content">
+                    <h3 class="business">Eatries:</h3>
+                     <label class="restaurant">Restaurant</label><input type="checkbox" name="restaurant" id="restaurant" value="restaurant" />
+                     <label class="restaurant">Cafe</label><input type="checkbox" name="cafe" id="cafe" value="cafe" />
+                     <label class="restaurant">Bar</label><input type="checkbox" name="bar" id="bar" value="bar" />
+                     <!--<label class="restaurant">Grocery Store</label><input type="checkbox" name="grocery-store" id="grocery" value="supermarket" />-->
+                     <label class="restaurant">Gas Station</label><input type="checkbox" name="gas-station" id="gas" value="fuel" />
+                     <label class="restaurant">Quick Service</label><input type="checkbox" name="chain" id="chain" value="fast_food" />
+                     <label class="restaurant">Ice Cream Parlor</label><input type="checkbox" name="ice_cream" id="ice_cream" value="ice_cream" />
+                     
+                  </div>
+                </div>
+                  
+                <!--Calories and Price Ranges-->
+                <div class="slidecontainer">
+                  <p>Calories Per Meal: <span id="demo"></span></p>
+                  <input type="range" min="180" max="3000" value="500" class="slider" id="myRange">
+                  
+                </div>
+              
+            </form>
+        </main>
+        <br>
+    <!--Map-->
+    <div id="map"></div>
+
+    <!--Order Menu-->
+    <div id="side-menu" class="side-menu" style="display: none;">
+      <button id="close-menu">Close</button>
+      <h2>Order from <span id="restaurant-name"></span></h2>
+      
+      <input type="text" id="search-bar" placeholder="Search menu items..." oninput="filterMenu()">
+      
+      <div id="menu-categories"></div>
+      
+      <div id="menu-items"></div>
+      
+      <button id="submit-order">Submit Order</button>
+    </div>
+    
+    <!--Footer-->
+    <footer class="nav">
+        <div class="nav-content">
+          <h3 class="nav-header">Crave Right&trade;</h3>
+           <div class="nav-list">
+             <ul class="nav-list">
+               <li class="nav-list-item"><a href="">Database</a></li>
+               <li class="nav-list-item"><a href="">Contact</a></li>
+             </ul>
+           </div>
+           <p class="nav-p">&copy; All Rights Reserved Crave Right, 2024</p>
+        </div>
+     </footer>
+
+    <!--leaflet js-->
+    <script src="assets/js/script.js"></script>
+</body>
+</html>
