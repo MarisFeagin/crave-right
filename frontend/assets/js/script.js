@@ -81,6 +81,35 @@ document.addEventListener('DOMContentLoaded', () => {
     // Define the business types to be fetched if no checkboxes are selected
     const defaultBusinessTypes = ['restaurant', 'cafe', 'bar', 'fast_food', 'ice_cream', 'gas_station'];
 
+    // Function to open the side menu and populate it with dynamic menu items
+    function openSideMenu(restaurantId) {
+        // Fetch the restaurant's menu from the simulated data
+        const menu = restaurantMenus[restaurantId];
+
+        // Clear previous menu items
+        const menuContainer = document.getElementById('menuItems');
+        menuContainer.innerHTML = '';
+
+        if (menu && menu.length > 0) {
+            menu.forEach(item => {
+                const menuItem = document.createElement('div');
+                menuItem.classList.add('menu-item');
+                menuItem.innerHTML = `<strong>${item.name}</strong> - ${item.price}`;
+                menuContainer.appendChild(menuItem);
+            });
+        } else {
+            menuContainer.innerHTML = '<p>No menu items available.</p>';
+        }
+
+        // Show the side menu by adding the 'open' class
+        document.getElementById('sideMenu').classList.add('open');
+    }
+
+// Add event listener for closing the side menu
+    document.getElementById('closeMenuButton').addEventListener('click', () => {
+        document.getElementById('sideMenu').classList.remove('open');
+    });
+
     // Fetch Restaurants Function
     async function fetchRestaurants(lat, lng, selectedTypes) {
         const radius = 4000;
@@ -140,18 +169,6 @@ document.addEventListener('DOMContentLoaded', () => {
                                 .addTo(map)
                                 .bindPopup(popupContent);
                             markers.push(newMarker);
-
-                            // Add event listener for the "Order Online" button dynamically
-                            const orderButton = document.getElementById(`order-online-btn-${element.id}`);
-                            if (orderButton) {
-                                orderButton.addEventListener('click', () => {
-                                    // Log the button click event to confirm it's being triggered
-                                    console.log("Order Online button clicked for:", name); // Debugging log
-
-                                    // Call openSideMenu with the correct parameters
-                                    openSideMenu(name, classification, dietInfo, address, phone, website, formattedOpeningHours);
-                                });
-                            }
                         }
                     }
                 }
@@ -164,55 +181,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Order Form inside Marker Pop-Up
-    // Function to open the side menu and populate it dynamically
-    function openSideMenu(restaurantName, classification, dietInfo, address, phone, website, openingHours) {
-        console.log("openSideMenu called", restaurantName); // Debugging log
+    // Delegate the "Order Online" button click event to the document
+    document.addEventListener('click', (event) => {
+        // Check if the clicked element is an "Order Online" button
+        if (event.target && event.target.classList.contains('order-online-btn')) {
+            const restaurantId = event.target.getAttribute('data-id');
 
-        // Update the side menu header with the restaurant name
-        document.getElementById('restaurant-name').innerText = restaurantName;
-
-        // Sample data for the menu. You should replace this with real data (e.g., fetched from an API).
-        const menuData = getMenuData(); // Replace with your actual data fetching method
-
-        // Populate menu categories and items
-        const categoriesDiv = document.getElementById("menu-categories");
-        const itemsDiv = document.getElementById("menu-items");
-        categoriesDiv.innerHTML = ''; // Clear previous categories
-        itemsDiv.innerHTML = ''; // Clear previous items
-
-        // Assuming menuData is an object like {category: ['item1', 'item2'], ...}
-        Object.keys(menuData).forEach(category => {
-            const categoryElement = document.createElement('div');
-            categoryElement.classList.add('category');
-            categoryElement.innerHTML = `<h3>${category}</h3>`;
-
-            menuData[category].forEach(item => {
-                const itemElement = document.createElement('div');
-                itemElement.classList.add('menu-item');
-                itemElement.innerText = item;
-                itemsDiv.appendChild(itemElement);
-            });
-
-            categoriesDiv.appendChild(categoryElement);
-        });
-
-        // Show the side menu
-        document.getElementById('side-menu').style.display = 'block';
-    }
-
-    // Sample menu data - replace with API data to be fetched
-    function getMenuData() {
-        return {
-            "Pizzas": ["Margherita", "Pepperoni", "Hawaiian"],
-            "Drinks": ["Coke", "Pepsi", "Lemonade"],
-            "Desserts": ["Chocolate Cake", "Ice Cream"]
-        };
-    }
-
-    // Close the side menu when the user clicks the close button
-    document.getElementById("close-menu").addEventListener("click", () => {
-        document.getElementById("side-menu").style.display = 'none';
+            // Open the side menu with the restaurant's menu
+            openSideMenu(restaurantId);
+        }
     });
 
     // Helper Functions
@@ -337,5 +314,4 @@ document.addEventListener('DOMContentLoaded', () => {
 function toggleDropdown() {
     document.getElementById("myDropdown").classList.toggle("show");
 }
-
 
