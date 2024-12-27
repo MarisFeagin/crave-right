@@ -24,4 +24,3 @@ Often businesses do not display how their food is cooked in the most accessible 
 ## Contributors
 - Maris Feagin, Lead Designer (https://github.com/MarisFeagin)
 - Ryan Moon, Debugging (https://github.com/moonryc/moonryc)
-- ChatGPT, Javascript Model (https://chatgpt.com)
